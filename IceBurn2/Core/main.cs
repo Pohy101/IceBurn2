@@ -46,11 +46,11 @@ namespace IceBurn
             Console.Write(DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + "." + DateTime.Now.Millisecond); 
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write("] [");
-            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.ForegroundColor = ConsoleColor.Blue;
             Console.Write("IceBurn");
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write("]: ");
-            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(message);
             Console.ForegroundColor = ConsoleColor.White;
         }

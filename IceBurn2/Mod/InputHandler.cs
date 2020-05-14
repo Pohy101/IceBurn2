@@ -9,6 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using VRC.SDKBase;
+using VRC;
+using VRC.Core;
+using VRC.UI;
 
 namespace IceBurn.Mod
 {
@@ -48,6 +51,15 @@ namespace IceBurn.Mod
             // Телепорт в точку которая находится на центре экрана по кнопку T
             if (Input.GetKeyDown(KeyCode.T))
                 GlobalUtils.RayTeleport();
+
+            // Клонирование аватара на кнопку B [при выбранном игроке]
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                ApiAvatar avatar = Wrapper.GetQuickMenu().GetSelectedPlayer().field_Internal_VRCPlayer_0.prop_ApiAvatar_0;
+
+                if (avatar.releaseStatus != "private")
+                    new PageAvatar { avatar = new SimpleAvatarPedestal { field_Internal_ApiAvatar_0 = new ApiAvatar { id = avatar.id } } }.ChangeToSelectedAvatar();
+            }
 
             // ESP или видеть игроков сквазь стены на кнопку O
             if (Input.GetKeyDown(KeyCode.O))
