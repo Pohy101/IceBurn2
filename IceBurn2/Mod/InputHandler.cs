@@ -61,6 +61,14 @@ namespace IceBurn.Mod
                     new PageAvatar { avatar = new SimpleAvatarPedestal { field_Internal_ApiAvatar_0 = new ApiAvatar { id = avatar.id } } }.ChangeToSelectedAvatar();
             }
 
+            // Это Функция временна для бинда клавиш на U [сломано НЕ ЮЗАЙ СУКА]
+            if (Input.GetKeyDown(KeyCode.U) && Wrapper.GetQuickMenu().GetSelectedPlayer() != null)
+                GlobalUtils.Follow = !GlobalUtils.Follow;
+
+            /* Зашита от долбаёба вроде меня
+            if (Wrapper.GetQuickMenu().GetSelectedPlayer() == null)
+                GlobalUtils.Follow = false; */
+
             // ESP или видеть игроков сквазь стены на кнопку O
             if (Input.GetKeyDown(KeyCode.O))
             {
@@ -119,6 +127,16 @@ namespace IceBurn.Mod
                     player.transform.position += playercamera.transform.up * flyspeed * Time.deltaTime;
                 if (Input.GetKey(KeyCode.Q))
                     player.transform.position -= playercamera.transform.up * flyspeed * Time.deltaTime;
+            }
+        }
+        public override void OnFixedUpdate()
+        {
+            if (GlobalUtils.Follow && Wrapper.GetQuickMenu().GetSelectedPlayer() != null)
+            {
+                Player selectedPlayer = Wrapper.GetQuickMenu().GetSelectedPlayer();
+                VRCPlayer currentPlayer = PlayerWrapper.GetCurrentPlayer();
+
+                currentPlayer.transform.position = selectedPlayer.transform.position + new Vector3(0f, 2f, 0f);
             }
         }
     }

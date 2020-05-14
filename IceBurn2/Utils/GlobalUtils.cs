@@ -14,6 +14,7 @@ namespace IceBurn.Utils
         // нужные переменные сюда
         public static bool Fly = false;
         public static bool ESP = false;
+        public static bool Follow = false;
         public static Vector3 Gravity = Physics.gravity;
 
         // телепорт в точку на экране

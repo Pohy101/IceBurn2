@@ -22,17 +22,19 @@ namespace IceBurn
         public override void OnUpdate()
         {
             foreach (var item in Addons)
-            {
                 item.OnUpdate();
-            }
+        }
+
+        public override void OnFixedUpdate()
+        {
+            foreach (var item in Addons)
+                item.OnFixedUpdate();
         }
 
         public override void VRChat_OnUiManagerInit()
         {
             foreach (var item in Addons)
-            {
                 item.OnStart();
-            }
         }
     }
 

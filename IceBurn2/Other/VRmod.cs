@@ -18,5 +18,10 @@ namespace IceBurn.Other
         {
 
         }
+
+        public virtual void OnFixedUpdate()
+        {
+
+        }
     }
 }
