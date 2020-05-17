@@ -35,5 +35,5 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: MelonModInfo(typeof(IceBurn.main), "IceBurn", "4.7.2", "IceFox", "Public")]
+[assembly: MelonModInfo(typeof(IceBurn.main), "IceBurn2", "2.6.0", "IceFox", "Public")]
 [assembly: MelonModGame("VRChat", "VRChat")]

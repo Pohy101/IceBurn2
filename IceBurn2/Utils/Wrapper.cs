@@ -69,6 +69,11 @@ namespace IceBurn.Utils
             return QuickMenu.prop_QuickMenu_0;
         }
 
+        public static VRCUiManager GetRCUiManager()
+        {
+            return VRCUiManager.field_Protected_Static_VRCUiManager_0;
+        }
+
         public static Player GetSelectedPlayer(this QuickMenu instance)
         {
             APIUser APIUser = instance.field_Private_APIUser_0;

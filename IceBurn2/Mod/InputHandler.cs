@@ -1,5 +1,4 @@
 ﻿using IceBurn.Other;
-using static IceBurn.IceLog;
 using IceBurn.Utils;
 using MelonLoader;
 using System;
@@ -17,8 +16,8 @@ namespace IceBurn.Mod
 {
     class InputHandler : VRmod
     {
-        public override string Name => "Test Mod";
-        public override string Description => "Testing first mod";
+        public override string Name => "Inputs";
+        public override string Description => "Inputs handling from here";
 
         // Переменные
         public static float flyspeed = 5f;
@@ -45,7 +44,7 @@ namespace IceBurn.Mod
                     GlobalUtils.ToggleColliders(false);
                 else
                     GlobalUtils.ToggleColliders(true);
-                IceLogger($"Fly has been {(GlobalUtils.Fly ? "Enabled" : "Disabled")}.");
+                IceLogger.Log($"Fly has been {(GlobalUtils.Fly ? "Enabled" : "Disabled")}.");
             }
 
             // Телепорт в точку которая находится на центре экрана по кнопку T
@@ -59,34 +58,29 @@ namespace IceBurn.Mod
 
                 if (avatar.releaseStatus != "private")
                     new PageAvatar { avatar = new SimpleAvatarPedestal { field_Internal_ApiAvatar_0 = new ApiAvatar { id = avatar.id } } }.ChangeToSelectedAvatar();
+                else
+                    IceLogger.Log("Avatar release status is PRIVATE!");
             }
-
-            // Это Функция временна для бинда клавиш на U [сломано НЕ ЮЗАЙ СУКА]
-            if (Input.GetKeyDown(KeyCode.U) && Wrapper.GetQuickMenu().GetSelectedPlayer() != null)
-                GlobalUtils.Follow = !GlobalUtils.Follow;
-
-            /* Зашита от долбаёба вроде меня
-            if (Wrapper.GetQuickMenu().GetSelectedPlayer() == null)
-                GlobalUtils.Follow = false; */
 
             // ESP или видеть игроков сквазь стены на кнопку O
             if (Input.GetKeyDown(KeyCode.O))
             {
                 GlobalUtils.ESP = !GlobalUtils.ESP;
-                IceLogger($"ESP has been {(GlobalUtils.Fly ? "Enabled" : "Disabled")}.");
+                IceLogger.Log($"ESP has been {(GlobalUtils.ESP ? "Enabled" : "Disabled")}.");
 
                 // Поиск и добавление игроков в ESP
                 GameObject[] array = GameObject.FindGameObjectsWithTag("Player");
                 for (int i = 0; i < array.Length; i++)
                 {
-                    if (array[i].transform.Find("SelectRegion"))
+                    Transform sRegion = array[i].transform.Find("SelectRegion");
+                    if (sRegion != null)
                     {
-                        array[i].transform.Find("SelectRegion").GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Color.red);
-                        HighlightsFX.prop_HighlightsFX_0.EnableOutline(array[i].transform.Find("SelectRegion").GetComponent<Renderer>(), GlobalUtils.ESP);
+                        sRegion.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Color.red);
+                        HighlightsFX.prop_HighlightsFX_0.EnableOutline(sRegion.GetComponent<Renderer>(), GlobalUtils.ESP);
                     }
                 }
 
-                // Поиск и добавление обьектов в ESP    И СУКА ПОЧЕМУ ТО ОНО НЕ РАБОТАЕТ!
+                // Поиск и добавление обьектов в ESP И СУКА ПОЧЕМУ ТО ОНО НЕ РАБОТАЕТ!
                 foreach (VRC_Pickup pickup in Resources.FindObjectsOfTypeAll<VRC_Pickup>())
                 {
                     if (pickup.gameObject.transform.Find("SelectRegion"))
@@ -131,13 +125,7 @@ namespace IceBurn.Mod
         }
         public override void OnFixedUpdate()
         {
-            if (GlobalUtils.Follow && Wrapper.GetQuickMenu().GetSelectedPlayer() != null)
-            {
-                Player selectedPlayer = Wrapper.GetQuickMenu().GetSelectedPlayer();
-                VRCPlayer currentPlayer = PlayerWrapper.GetCurrentPlayer();
 
-                currentPlayer.transform.position = selectedPlayer.transform.position + new Vector3(0f, 2f, 0f);
-            }
         }
     }
 }

@@ -35,6 +35,10 @@
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="DiscordRPC">
+      <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\UserData\IceBurn\DiscordRPC.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Il2Cppmscorlib">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Il2Cppmscorlib.dll</HintPath>
       <Private>False</Private>
@@ -65,6 +69,10 @@
     <Reference Include="System.Xml" />
     <Reference Include="UnhollowerBaseLib">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnhollowerBaseLib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnhollowerRuntimeLib">
+      <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnhollowerRuntimeLib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
@@ -98,6 +106,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\main.cs" />
+    <Compile Include="Mod\Discord.cs" />
+    <Compile Include="Mod\GUI.cs" />
     <Compile Include="Mod\InputHandler.cs" />
     <Compile Include="API\IceButtonAPI.cs" />
     <Compile Include="Other\VRmod.cs" />

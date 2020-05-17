@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using VRC.SDKBase;
+using UnhollowerRuntimeLib;
 
 namespace IceBurn.Utils
 {
@@ -14,7 +15,6 @@ namespace IceBurn.Utils
         // нужные переменные сюда
         public static bool Fly = false;
         public static bool ESP = false;
-        public static bool Follow = false;
         public static Vector3 Gravity = Physics.gravity;
 
         // телепорт в точку на экране
@@ -33,7 +33,7 @@ namespace IceBurn.Utils
         public static void ToggleColliders(bool Toggle)
         {
             Collider[] array = UnityEngine.Object.FindObjectsOfType<Collider>();
-            Component component = PlayerWrapper.GetCurrentPlayer().GetComponents(Collider.Il2CppType).FirstOrDefault<Component>();
+            Component component = PlayerWrapper.GetCurrentPlayer().GetComponents(Il2CppTypeOf<Collider>.Type).FirstOrDefault<Component>();
 
             for (int i = 0; i < array.Length; i++)
             {
