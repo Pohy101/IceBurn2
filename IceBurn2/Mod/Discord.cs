@@ -1,49 +1,50 @@
 ﻿using IceBurn.Other;
-using DiscordRPC;
 using System;
-using System.Text;
-using System.Threading;
+using System.IO;
+using System.Net;
+using MelonLoader;
+using DiscordRichPresence;
 
 namespace IceBurn.Other
 {
+    class otherrrrr : MelonMod
+    {
+        public override void OnApplicationStart()
+        {
+            ModPrefs.RegisterPrefBool("vrcdiscordpresence", "hidenameondiscord", true, "Hide your name on Discord", false);
+            if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory, "Dependencies")))
+                Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "Dependencies"));
+            if (!File.Exists(Path.Combine(Environment.CurrentDirectory, "Dependencies/discord-rpc.dll")))
+            {
+                using (WebClient webClient = new WebClient())
+                {
+                    webClient.DownloadFile("http://thetrueyoshifan.com/downloads/discord-rpc.dll", Path.Combine(Environment.CurrentDirectory, "Dependencies/discord-rpc.dll"));
+                }
+            }
+        }
+    }
+
+
     class Discord : VRmod
     {
         public override string Name => "Discord Rich Presence";
-        public override string Description => "Status for discord";
-
-        private static int discordPipe = -1;
-        private static RichPresence presence = new RichPresence()
-        {
-            Details = "Testing IceBurn 2.0",
-            State = "Playing VRChat",
-            Timestamps = Timestamps.FromTimeSpan(10),
-            Assets = new Assets()
-            {
-                LargeImageKey = "large",
-                LargeImageText = "C#",
-                SmallImageKey = "smallVR",
-                SmallImageText = "VRChat"
-            }
-        };
+        public override string Description => "Custom status for discord";
 
         public override void OnStart()
         {
-            var client = new DiscordRpcClient("702183174205210674", pipe: discordPipe) { };
-
-            client.OnReady += (sender, msg) =>
-            {
-                Console.WriteLine("Connected to discord with user {0}", msg.User.Username);
-            };
-
-            client.OnPresenceUpdate += (sender, msg) =>
-            {
-                Console.WriteLine("Presence has been updated! ");
-            };
-
-            client.Initialize();
-            client.SetPresence(presence);
-            //Console.ReadKey();
-            client.Dispose();
+            DiscordManager.Init();
         }
+
+        public override void OnUpdate()
+        {
+            DiscordRichPresence.DiscordManager.Update();
+        }
+
+        public override void OnQuit()
+        {
+            DiscordManager.OnApplicationQuit();
+        }
+
+
     }
 }

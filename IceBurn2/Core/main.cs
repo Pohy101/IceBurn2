@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DiscordRPC;
 using MelonLoader;
 using IceBurn.Other;
 using IceBurn.Mod;
-using Org.BouncyCastle.Asn1.X509;
-using System.Net;
 
 namespace IceBurn
 {
@@ -38,6 +34,12 @@ namespace IceBurn
         {
             foreach (var item in Addons)
                 item.OnStart();
+        }
+
+        public override void OnApplicationQuit()
+        {
+            foreach (var item in Addons)
+                item.OnQuit();
         }
     }
 
