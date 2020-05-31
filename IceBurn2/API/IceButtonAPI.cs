@@ -1,26 +1,40 @@
-﻿using IceBurn.Utils;
-using System.Reflection;
-using System;
+﻿using System;
+using Il2CppSystem.Reflection;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
+using UnityEngine.Events;
+using UnhollowerRuntimeLib;
 
 namespace IceBurn.API
 {
-    // Создаем основу кнопки от Quick Menu
+
+    public static class QMButtonAPI
+    {
+        //REPLACE THIS STRING SO YOUR MENU DOESNT COLLIDE WITH OTHER MENUS
+        public static string identifier = "IceBurn";
+        public static Color mBackground = Color.red;
+        public static Color mForeground = Color.white;
+        public static Color bBackground = Color.red;
+        public static Color bForeground = Color.yellow;
+        public static List<QMSingleButton> allSingleButtons = new List<QMSingleButton>();
+        public static List<QMHalfButton> allHalfButtons = new List<QMHalfButton>();
+        public static List<QMToggleButton> allToggleButtons = new List<QMToggleButton>();
+        public static List<QMNestedButton> allNestedButtons = new List<QMNestedButton>();
+    }
+
     public class QMButtonBase
     {
         protected GameObject button;
         protected string btnQMLoc;
         protected string btnType;
         protected string btnTag;
-        protected int[] position = { 0, 0 };
+        protected int[] initShift = { 0, 0 };
+        protected Color OrigBackground;
+        protected Color OrigText;
 
-        public GameObject GetGameObject()
+        public GameObject getGameObject()
         {
             return button;
         }
@@ -30,114 +44,757 @@ namespace IceBurn.API
             button.gameObject.SetActive(isActive);
         }
 
-        public void setLocation(int btnXLocation, int btnYLocation)
+        public void setIntractable(bool isIntractable)
         {
-            button.GetComponent<RectTransform>().anchoredPosition += Vector2.right * (420 * (btnXLocation + position[0]));
-            button.GetComponent<RectTransform>().anchoredPosition += Vector2.down * (420 * (btnYLocation + position[1]));
+            if (isIntractable)
+            {
+                setBackgroundColor(OrigBackground, false);
+                setTextColor(OrigText, false);
+            }
+            else
+            {
+                setBackgroundColor(new Color(0.5f, 0.5f, 0.5f, 1), false);
+                setTextColor(new Color(0.7f, 0.7f, 0.7f, 1), false); ;
+            }
+            button.gameObject.GetComponent<Button>().interactable = isIntractable;
+        }
 
-            btnTag = "(" + btnXLocation + ", " + btnYLocation + ")";
+        public void setLocation(int buttonXLoc, int buttonYLoc)
+        {
+            button.GetComponent<RectTransform>().anchoredPosition += Vector2.right * (420 * (buttonXLoc + initShift[0]));
+            button.GetComponent<RectTransform>().anchoredPosition += Vector2.down * (420 * (buttonYLoc + initShift[1]));
+
+            btnTag = "(" + buttonXLoc + "," + buttonYLoc + ")";
             button.name = btnQMLoc + "/" + btnType + btnTag;
             button.GetComponent<Button>().name = btnType + btnTag;
         }
 
-        public void setToolTip(string btnToolTip)
+        public void setToolTip(string buttonToolTip)
         {
-            button.GetComponent<UiTooltip>().text = btnToolTip;
-            button.GetComponent<UiTooltip>().alternateText = btnToolTip;
+            button.GetComponent<UiTooltip>().text = buttonToolTip;
+            button.GetComponent<UiTooltip>().alternateText = buttonToolTip;
         }
+
+        public void DestroyMe()
+        {
+            try
+            {
+                UnityEngine.Object.Destroy(button);
+            }
+            catch { }
+        }
+
+        public virtual void setBackgroundColor(Color buttonBackgroundColor, bool save = true) { }
+        public virtual void setTextColor(Color buttonTextColor, bool save = true) { }
     }
 
-    // ! Потом нужно добавить QMNested версию
+    public class QMHalfButtonBase
+    {
+        protected GameObject button;
+        protected string btnQMLoc;
+        protected string btnType;
+        protected string btnTag;
+        protected int[] initShift = { 0, 0 };
+        protected Color OrigBackground;
+        protected Color OrigText;
+
+        public GameObject getGameObject()
+        {
+            return button;
+        }
+
+        public void setActive(bool isActive)
+        {
+            button.gameObject.SetActive(isActive);
+        }
+
+        public void setIntractable(bool isIntractable)
+        {
+            if (isIntractable)
+            {
+                setBackgroundColor(OrigBackground, false);
+                setTextColor(OrigText, false);
+            }
+            else
+            {
+                setBackgroundColor(new Color(0.5f, 0.5f, 0.5f, 1), false);
+                setTextColor(new Color(0.7f, 0.7f, 0.7f, 1), false); ;
+            }
+            button.gameObject.GetComponent<Button>().interactable = isIntractable;
+        }
+
+        public void setLocation(float buttonXLoc, float buttonYLoc)
+        {
+            button.GetComponent<RectTransform>().sizeDelta = new Vector2(button.GetComponent<RectTransform>().sizeDelta.x, button.GetComponent<RectTransform>().sizeDelta.y / 2);
+            button.GetComponent<RectTransform>().anchoredPosition += Vector2.right * (420 * (buttonXLoc + initShift[0]));
+            button.GetComponent<RectTransform>().anchoredPosition += Vector2.down * (210 * (buttonYLoc + initShift[1]));
+
+
+            btnTag = "(" + buttonXLoc + "," + buttonYLoc + ")";
+            button.name = btnQMLoc + "/" + btnType + btnTag;
+            button.GetComponent<Button>().name = btnType + btnTag;
+        }
+
+        public void setToolTip(string buttonToolTip)
+        {
+            button.GetComponent<UiTooltip>().text = buttonToolTip;
+            button.GetComponent<UiTooltip>().alternateText = buttonToolTip;
+        }
+
+        public void DestroyMe()
+        {
+            try
+            {
+                UnityEngine.Object.Destroy(button);
+            }
+            catch { }
+        }
+
+        public virtual void setBackgroundColor(Color buttonBackgroundColor, bool save = true) { }
+        public virtual void setTextColor(Color buttonTextColor, bool save = true) { }
+    }
+
     public class QMSingleButton : QMButtonBase
     {
-        // ! Nesded версию сюда
-
-        public QMSingleButton(string btnMenu, int btnXLocation, int btnYLocation, String btnText, UnityAction btnAction, String btnToolTip, Nullable<Color> btnBackgroundColor = null, Nullable<Color> btnTextColor = null)
+        public QMSingleButton(QMNestedButton btnMenu, int btnXLocation, int btnYLocation, String btnText, System.Action btnAction, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null)
         {
-            btnQMLoc = btnMenu;
-            btnType = "SingleButton";
-            // ! Инициализация
+            btnQMLoc = btnMenu.getMenuName();
+            initButton(btnXLocation, btnYLocation, btnText, btnAction, btnToolTip, btnBackgroundColor, btnTextColor);
         }
 
-        private void initButton(int btnXlocation, int btnYLocation, String btnText, UnityAction btnAction, String btnToolTip, Nullable<Color> btnBackgroundColor = null, Nullable<Color> btnTextColor = null)
+        public QMSingleButton(string btnMenu, int btnXLocation, int btnYLocation, String btnText, System.Action btnAction, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null)
         {
-            Transform btnTemplate = null;
-            // ! btnTemplate = Qui
+            btnQMLoc = btnMenu;
+            initButton(btnXLocation, btnYLocation, btnText, btnAction, btnToolTip, btnBackgroundColor, btnTextColor);
+        }
+
+        private void initButton(int btnXLocation, int btnYLocation, String btnText, System.Action btnAction, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null)
+        {
+            btnType = "SingleButton";
+            button = UnityEngine.Object.Instantiate(QMStuff.SingleButtonTemplate(), QMStuff.GetQuickMenuInstance().transform.Find(btnQMLoc), true);
+
+            initShift[0] = -1;
+            initShift[1] = 0;
+            setLocation(btnXLocation, btnYLocation);
+            setButtonText(btnText);
+            setToolTip(btnToolTip);
+            setAction(btnAction);
+
+
+            if (btnBackgroundColor != null)
+                setBackgroundColor((Color)btnBackgroundColor);
+            else
+                OrigBackground = button.GetComponentInChildren<UnityEngine.UI.Image>().color;
+
+            if (btnTextColor != null)
+                setTextColor((Color)btnTextColor);
+            else
+                OrigText = button.GetComponentInChildren<Text>().color;
+
+            setActive(true);
+            QMButtonAPI.allSingleButtons.Add(this);
+        }
+
+        public void setButtonText(string buttonText)
+        {
+            button.GetComponentInChildren<Text>().text = buttonText;
+        }
+
+        public void setAction(System.Action buttonAction)
+        {
+            button.GetComponent<Button>().onClick = new Button.ButtonClickedEvent();
+            if (buttonAction != null)
+                button.GetComponent<Button>().onClick.AddListener(UnhollowerRuntimeLib.DelegateSupport.ConvertDelegate<UnityAction>(buttonAction));
+        }
+
+        public override void setBackgroundColor(Color buttonBackgroundColor, bool save = true)
+        {
+            //button.GetComponentInChildren<UnityEngine.UI.Image>().color = buttonBackgroundColor;
+            if (save)
+                OrigBackground = (Color)buttonBackgroundColor;
+            //UnityEngine.UI.Image[] btnBgColorList = ((btnOn.GetComponentsInChildren<UnityEngine.UI.Image>()).Concat(btnOff.GetComponentsInChildren<UnityEngine.UI.Image>()).ToArray()).Concat(button.GetComponentsInChildren<UnityEngine.UI.Image>()).ToArray();
+            //foreach (UnityEngine.UI.Image btnBackground in btnBgColorList) btnBackground.color = buttonBackgroundColor;
+            button.GetComponentInChildren<UnityEngine.UI.Button>().colors = new ColorBlock()
+            {
+                colorMultiplier = 1f,
+                disabledColor = Color.grey,
+                highlightedColor = buttonBackgroundColor * 1.5f,
+                normalColor = buttonBackgroundColor / 1.5f,
+                pressedColor = Color.grey * 1.5f
+            };
+        }
+
+        public override void setTextColor(Color buttonTextColor, bool save = true)
+        {
+            button.GetComponentInChildren<Text>().color = buttonTextColor;
+            if (save)
+                OrigText = (Color)buttonTextColor;
         }
     }
 
-    public class QuickMenuStuff : MonoBehaviour
+    public class QMHalfButton : QMHalfButtonBase
     {
-        private static VRCUiManager vrcuimInstance = Wrapper.GetRCUiManager();
+        public QMHalfButton(QMNestedButton btnMenu, float btnXLocation, float btnYLocation, String btnText, System.Action btnAction, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null)
+        {
+            btnQMLoc = btnMenu.getMenuName();
+            initButton(btnXLocation, btnYLocation, btnText, btnAction, btnToolTip, btnBackgroundColor, btnTextColor);
+        }
 
-        // Чтобы быстрее достать QM
+        public QMHalfButton(string btnMenu, float btnXLocation, float btnYLocation, String btnText, System.Action btnAction, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null)
+        {
+            btnQMLoc = btnMenu;
+            initButton(btnXLocation, btnYLocation, btnText, btnAction, btnToolTip, btnBackgroundColor, btnTextColor);
+        }
+
+        private void initButton(float btnXLocation, float btnYLocation, String btnText, System.Action btnAction, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null)
+        {
+            btnType = "HalfButton";
+            button = UnityEngine.Object.Instantiate(QMStuff.SingleButtonTemplate(), QMStuff.GetQuickMenuInstance().transform.Find(btnQMLoc), true);
+
+            initShift[0] = -1;
+            initShift[1] = 0;
+            setLocation(btnXLocation, btnYLocation);
+            setButtonText(btnText);
+            setToolTip(btnToolTip);
+            setAction(btnAction);
+
+
+            if (btnBackgroundColor != null)
+                setBackgroundColor((Color)btnBackgroundColor);
+            else
+                OrigBackground = button.GetComponentInChildren<UnityEngine.UI.Image>().color;
+
+            if (btnTextColor != null)
+                setTextColor((Color)btnTextColor);
+            else
+                OrigText = button.GetComponentInChildren<Text>().color;
+
+            setActive(true);
+            QMButtonAPI.allHalfButtons.Add(this);
+        }
+
+        public void setButtonText(string buttonText)
+        {
+            button.GetComponentInChildren<Text>().text = buttonText;
+        }
+
+        public void setAction(System.Action buttonAction)
+        {
+            button.GetComponent<Button>().onClick = new Button.ButtonClickedEvent();
+            if (buttonAction != null)
+                button.GetComponent<Button>().onClick.AddListener(UnhollowerRuntimeLib.DelegateSupport.ConvertDelegate<UnityAction>(buttonAction));
+        }
+
+        public override void setBackgroundColor(Color buttonBackgroundColor, bool save = true)
+        {
+            //button.GetComponentInChildren<UnityEngine.UI.Image>().color = buttonBackgroundColor;
+            if (save)
+                OrigBackground = (Color)buttonBackgroundColor;
+            //UnityEngine.UI.Image[] btnBgColorList = ((btnOn.GetComponentsInChildren<UnityEngine.UI.Image>()).Concat(btnOff.GetComponentsInChildren<UnityEngine.UI.Image>()).ToArray()).Concat(button.GetComponentsInChildren<UnityEngine.UI.Image>()).ToArray();
+            //foreach (UnityEngine.UI.Image btnBackground in btnBgColorList) btnBackground.color = buttonBackgroundColor;
+            button.GetComponentInChildren<UnityEngine.UI.Button>().colors = new ColorBlock()
+            {
+                colorMultiplier = 1f,
+                disabledColor = Color.grey,
+                highlightedColor = buttonBackgroundColor * 1.5f,
+                normalColor = buttonBackgroundColor / 1.5f,
+                pressedColor = Color.grey * 1.5f
+            };
+        }
+
+        public override void setTextColor(Color buttonTextColor, bool save = true)
+        {
+            button.GetComponentInChildren<Text>().color = buttonTextColor;
+            if (save)
+                OrigText = (Color)buttonTextColor;
+        }
+    }
+
+    public class QMToggleButton : QMButtonBase
+    {
+        public GameObject btnOn;
+        public GameObject btnOff;
+        public List<QMButtonBase> showWhenOn = new List<QMButtonBase>();
+        public List<QMButtonBase> hideWhenOn = new List<QMButtonBase>();
+        public bool shouldSaveInConfig = false;
+
+        System.Action btnOnAction = null;
+        System.Action btnOffAction = null;
+
+        public QMToggleButton(QMNestedButton btnMenu, int btnXLocation, int btnYLocation, String btnTextOn, System.Action btnActionOn, String btnTextOff, System.Action btnActionOff, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null, bool shouldSaveInConfig = false, bool defaultPosition = false)
+        {
+            btnQMLoc = btnMenu.getMenuName();
+            initButton(btnXLocation, btnYLocation, btnTextOn, btnActionOn, btnTextOff, btnActionOff, btnToolTip, btnBackgroundColor, btnTextColor, shouldSaveInConfig, defaultPosition);
+        }
+
+        public QMToggleButton(string btnMenu, int btnXLocation, int btnYLocation, String btnTextOn, System.Action btnActionOn, String btnTextOff, System.Action btnActionOff, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null, bool shouldSaveInConfig = false, bool defaultPosition = false)
+        {
+            btnQMLoc = btnMenu;
+            initButton(btnXLocation, btnYLocation, btnTextOn, btnActionOn, btnTextOff, btnActionOff, btnToolTip, btnBackgroundColor, btnTextColor, shouldSaveInConfig, defaultPosition);
+        }
+
+        private void initButton(int btnXLocation, int btnYLocation, String btnTextOn, System.Action btnActionOn, String btnTextOff, System.Action btnActionOff, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null, bool shouldSaveInConf = false, bool defaultPosition = false)
+        {
+            btnType = "ToggleButton";
+            button = UnityEngine.Object.Instantiate<GameObject>(QMStuff.ToggleButtonTemplate(), QMStuff.GetQuickMenuInstance().transform.Find(btnQMLoc), true);
+
+            btnOn = button.transform.Find("Toggle_States_Visible/ON").gameObject;
+            btnOff = button.transform.Find("Toggle_States_Visible/OFF").gameObject;
+
+            initShift[0] = -4;
+            initShift[1] = 0;
+            setLocation(btnXLocation, btnYLocation);
+
+            setOnText(btnTextOn);
+            setOffText(btnTextOff);
+            Text[] btnTextsOn = btnOn.GetComponentsInChildren<Text>();
+            btnTextsOn[0].name = "Text_ON";
+            btnTextsOn[0].resizeTextForBestFit = true;
+            btnTextsOn[1].name = "Text_OFF";
+            btnTextsOn[1].resizeTextForBestFit = true;
+            Text[] btnTextsOff = btnOff.GetComponentsInChildren<Text>();
+            btnTextsOff[0].name = "Text_ON";
+            btnTextsOff[0].resizeTextForBestFit = true;
+            btnTextsOff[1].name = "Text_OFF";
+            btnTextsOff[1].resizeTextForBestFit = true;
+
+            setToolTip(btnToolTip);
+            //button.transform.GetComponentInChildren<UiTooltip>().SetToolTipBasedOnToggle();
+
+            setAction(btnActionOn, btnActionOff);
+            btnOn.SetActive(false);
+            btnOff.SetActive(true);
+
+            if (btnBackgroundColor != null)
+                setBackgroundColor((Color)btnBackgroundColor);
+            else
+                OrigBackground = btnOn.GetComponentsInChildren<Text>().First().color;
+
+            if (btnTextColor != null)
+                setTextColor((Color)btnTextColor);
+            else
+                OrigText = btnOn.GetComponentsInChildren<UnityEngine.UI.Image>().First().color;
+
+            setActive(true);
+            shouldSaveInConfig = shouldSaveInConf;
+            if (defaultPosition == true)// && !ButtonSettings.Contains(this))
+            {
+                setToggleState(true, false);
+            }
+
+            QMButtonAPI.allToggleButtons.Add(this);
+            //ButtonSettings.InitToggle(this);
+        }
+
+        public override void setBackgroundColor(Color buttonBackgroundColor, bool save = true)
+        {
+            UnityEngine.UI.Image[] btnBgColorList = ((btnOn.GetComponentsInChildren<UnityEngine.UI.Image>()).Concat(btnOff.GetComponentsInChildren<UnityEngine.UI.Image>()).ToArray()).Concat(button.GetComponentsInChildren<UnityEngine.UI.Image>()).ToArray();
+            foreach (UnityEngine.UI.Image btnBackground in btnBgColorList) btnBackground.color = buttonBackgroundColor;
+            if (save)
+                OrigBackground = (Color)buttonBackgroundColor;
+        }
+
+        public override void setTextColor(Color buttonTextColor, bool save = true)
+        {
+            Text[] btnTxtColorList = (btnOn.GetComponentsInChildren<Text>()).Concat(btnOff.GetComponentsInChildren<Text>()).ToArray();
+            foreach (Text btnText in btnTxtColorList) btnText.color = buttonTextColor;
+            if (save)
+                OrigText = (Color)buttonTextColor;
+        }
+
+        public void setAction(System.Action buttonOnAction, System.Action buttonOffAction)
+        {
+            btnOnAction = buttonOnAction;
+            btnOffAction = buttonOffAction;
+
+            button.GetComponent<Button>().onClick = new Button.ButtonClickedEvent();
+            button.GetComponent<Button>().onClick.AddListener(UnhollowerRuntimeLib.DelegateSupport.ConvertDelegate<UnityAction>((System.Action)(() =>
+            {
+                if (btnOn.activeSelf)
+                {
+                    setToggleState(false, true);
+                }
+                else
+                {
+                    setToggleState(true, true);
+                }
+            })));
+        }
+
+
+        public void setToggleState(bool toggleOn, bool shouldInvoke = false)
+        {
+            btnOn.SetActive(toggleOn);
+            btnOff.SetActive(!toggleOn);
+            try
+            {
+                if (toggleOn && shouldInvoke)
+                {
+                    btnOnAction.Invoke();
+                    showWhenOn.ForEach(x => x.setActive(true));
+                    hideWhenOn.ForEach(x => x.setActive(false));
+                }
+                else if (!toggleOn && shouldInvoke)
+                {
+                    btnOffAction.Invoke();
+                    showWhenOn.ForEach(x => x.setActive(false));
+                    hideWhenOn.ForEach(x => x.setActive(true));
+                }
+            }
+            catch { }
+
+            if (shouldSaveInConfig)
+            {
+                //ButtonSettings.UpdateToggle(this);
+            }
+        }
+
+        public string getOnText()
+        {
+            return btnOn.GetComponentsInChildren<Text>()[0].text;
+        }
+
+        public void setOnText(string buttonOnText)
+        {
+            Text[] btnTextsOn = btnOn.GetComponentsInChildren<Text>();
+            btnTextsOn[0].text = buttonOnText;
+            Text[] btnTextsOff = btnOff.GetComponentsInChildren<Text>();
+            btnTextsOff[0].text = buttonOnText;
+        }
+
+        public void setOffText(string buttonOffText)
+        {
+            Text[] btnTextsOn = btnOn.GetComponentsInChildren<Text>();
+            btnTextsOn[1].text = buttonOffText;
+            Text[] btnTextsOff = btnOff.GetComponentsInChildren<Text>();
+            btnTextsOff[1].text = buttonOffText;
+        }
+
+    }
+
+    public class QMNestedButton
+    {
+        protected QMSingleButton mainButton;
+        protected QMSingleButton backButton;
+        protected string menuName;
+        protected string btnQMLoc;
+        protected string btnType;
+
+        public QMNestedButton(QMNestedButton btnMenu, int btnXLocation, int btnYLocation, String btnText, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null, Color? backbtnBackgroundColor = null, Color? backbtnTextColor = null)
+        {
+            btnQMLoc = btnMenu.getMenuName();
+            initButton(btnXLocation, btnYLocation, btnText, btnToolTip, btnBackgroundColor, btnTextColor, backbtnBackgroundColor, backbtnTextColor);
+        }
+
+        public QMNestedButton(QMNestedButton btnMenu, int btnXLocation, int btnYLocation, String btnText, System.Action btnAction, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null, Color? backbtnBackgroundColor = null, Color? backbtnTextColor = null)
+        {
+            btnQMLoc = btnMenu.getMenuName();
+            initButtonX(btnXLocation, btnYLocation, btnText, btnAction, btnToolTip, btnBackgroundColor, btnTextColor, backbtnBackgroundColor, backbtnTextColor);
+        }
+
+        public QMNestedButton(string btnMenu, int btnXLocation, int btnYLocation, String btnText, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null, Color? backbtnBackgroundColor = null, Color? backbtnTextColor = null)
+        {
+            btnQMLoc = btnMenu;
+            initButton(btnXLocation, btnYLocation, btnText, btnToolTip, btnBackgroundColor, btnTextColor, backbtnBackgroundColor, backbtnTextColor);
+        }
+
+        public QMNestedButton(string btnMenu, int btnXLocation, int btnYLocation, String btnText, System.Action btnAction, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null, Color? backbtnBackgroundColor = null, Color? backbtnTextColor = null)
+        {
+            btnQMLoc = btnMenu;
+            initButtonX(btnXLocation, btnYLocation, btnText, btnAction, btnToolTip, btnBackgroundColor, btnTextColor, backbtnBackgroundColor, backbtnTextColor);
+        }
+
+        public void initButton(int btnXLocation, int btnYLocation, String btnText, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null, Color? backbtnBackgroundColor = null, Color? backbtnTextColor = null)
+        {
+            btnType = "NestedButton";
+
+            Transform menu = UnityEngine.Object.Instantiate<Transform>(QMStuff.NestedMenuTemplate(), QMStuff.GetQuickMenuInstance().transform);
+            menuName = QMButtonAPI.identifier + btnQMLoc + "_" + btnXLocation + "_" + btnYLocation;
+            menu.name = menuName;
+
+            mainButton = new QMSingleButton(btnQMLoc, btnXLocation, btnYLocation, btnText, () => { QMStuff.ShowQuickmenuPage(menuName); }, btnToolTip, btnBackgroundColor, btnTextColor);
+
+            Il2CppSystem.Collections.IEnumerator enumerator = menu.transform.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                Il2CppSystem.Object obj = enumerator.Current;
+                Transform btnEnum = obj.Cast<Transform>();
+                if (btnEnum != null)
+                {
+                    UnityEngine.Object.Destroy(btnEnum.gameObject);
+                }
+            }
+
+            if (backbtnTextColor == null)
+            {
+                backbtnTextColor = Color.white;
+            }
+            QMButtonAPI.allNestedButtons.Add(this);
+            backButton = new QMSingleButton(this, 5, 2, "Back", () => { QMStuff.ShowQuickmenuPage(btnQMLoc); }, "Go Back", backbtnBackgroundColor, backbtnTextColor);
+        }
+
+        public void initButtonX(int btnXLocation, int btnYLocation, String btnText, System.Action btnAction, String btnToolTip, Color? btnBackgroundColor = null, Color? btnTextColor = null, Color? backbtnBackgroundColor = null, Color? backbtnTextColor = null)
+        {
+            btnType = "NestedButton";
+
+            Transform menu = UnityEngine.Object.Instantiate<Transform>(QMStuff.NestedMenuTemplate(), QMStuff.GetQuickMenuInstance().transform);
+            menuName = QMButtonAPI.identifier + btnQMLoc + "_" + btnXLocation + "_" + btnYLocation;
+            menu.name = menuName;
+
+            mainButton = new QMSingleButton(btnQMLoc, btnXLocation, btnYLocation, btnText, () => { QMStuff.ShowQuickmenuPage(menuName); } + btnAction, btnToolTip, btnBackgroundColor, btnTextColor);
+
+            Il2CppSystem.Collections.IEnumerator enumerator = menu.transform.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                Il2CppSystem.Object obj = enumerator.Current;
+                Transform btnEnum = obj.Cast<Transform>();
+                if (btnEnum != null)
+                {
+                    UnityEngine.Object.Destroy(btnEnum.gameObject);
+                }
+            }
+
+            if (backbtnTextColor == null)
+            {
+                backbtnTextColor = Color.white;
+            }
+            QMButtonAPI.allNestedButtons.Add(this);
+            backButton = new QMSingleButton(this, 5, 2, "Back", () => { QMStuff.ShowQuickmenuPage(btnQMLoc); }, "Go Back", backbtnBackgroundColor, backbtnTextColor);
+        }
+
+        public string getMenuName()
+        {
+            return menuName;
+        }
+
+        public QMSingleButton getMainButton()
+        {
+            return mainButton;
+        }
+
+        public QMSingleButton getBackButton()
+        {
+            return backButton;
+        }
+
+        public void DestroyMe()
+        {
+            mainButton.DestroyMe();
+            backButton.DestroyMe();
+        }
+    }
+
+    public class QMStuff
+    {
+        // Internal cache of the BoxCollider Background for the Quick Menu
+        private static BoxCollider QuickMenuBackgroundReference;
+
+        // Internal cache of the Single Button Template for the Quick Menu
+        private static GameObject SingleButtonReference;
+
+        // Internal cache of the Toggle Button Template for the Quick Menu
+        private static GameObject ToggleButtonReference;
+
+        // Internal cache of the Nested Menu Template for the Quick Menu
+        private static Transform NestedButtonReference;
+
+        // Internal cache of the QuickMenu
+        private static QuickMenu quickmenuInstance;
+
+        // Internal cache of the VRCUiManager
+        private static VRCUiManager vrcuimInstance;
+
+
+
+        // Fetch the background from the Quick Menu
+        public static BoxCollider QuickMenuBackground()
+        {
+            if (QuickMenuBackgroundReference == null)
+                QuickMenuBackgroundReference = GetQuickMenuInstance().GetComponent<BoxCollider>();
+            return QuickMenuBackgroundReference;
+        }
+
+        // Fetch the Single Button Template from the Quick Menu
+        public static GameObject SingleButtonTemplate()
+        {
+            if (SingleButtonReference == null)
+                SingleButtonReference = GetQuickMenuInstance().transform.Find("ShortcutMenu/WorldsButton").gameObject;
+            return SingleButtonReference;
+        }
+
+        // Fetch the Toggle Button Template from the Quick Menu
+        public static GameObject ToggleButtonTemplate()
+        {
+            if (ToggleButtonReference == null)
+            {
+                ToggleButtonReference = GetQuickMenuInstance().transform.Find("UserInteractMenu/BlockButton").gameObject;
+            }
+            return ToggleButtonReference;
+        }
+
+        // Fetch the Nested Menu Template from the Quick Menu
+        public static Transform NestedMenuTemplate()
+        {
+            if (NestedButtonReference == null)
+            {
+                NestedButtonReference = GetQuickMenuInstance().transform.Find("CameraMenu");
+            }
+            return NestedButtonReference;
+        }
+
+        // Fetch the Quick Menu instance
         public static QuickMenu GetQuickMenuInstance()
         {
-            return Wrapper.GetQuickMenu();
+            if (quickmenuInstance == null)
+            {
+                quickmenuInstance = QuickMenu.prop_QuickMenu_0;
+            }
+            return quickmenuInstance;
+        }
+        // Fetch the VRCUiManager instance
+        public static VRCUiManager GetVRCUiMInstance()
+        {
+            if (vrcuimInstance == null)
+            {
+                vrcuimInstance = VRCUiManager.field_Protected_Static_VRCUiManager_0;
+            }
+            return vrcuimInstance;
         }
 
-        // System Reflection
+        // Cache the FieldInfo for getting the current page. Hope to god this works!
         private static FieldInfo currentPageGetter;
-        private static FieldInfo quickmenuContextDisplayGetter; // что?
 
+        // Show a Quick Menu page via the Page Name. Hope to god this works!
         public static void ShowQuickmenuPage(string pagename)
         {
-            QuickMenu quickMenuInstance = GetQuickMenuInstance();
-            Transform transform = (quickMenuInstance != null ? quickMenuInstance.transform.Find(pagename) : null);
-            if (transform == null)
+            QuickMenu quickmenu = GetQuickMenuInstance();
+            Transform pageTransform = quickmenu?.transform.Find(pagename);
+            if (pageTransform == null)
             {
-                IceLogger.Error("[QuickMenuUtils] pageTransform is null !");
+                Console.WriteLine("[QMStuff] pageTransform is null !");
             }
+
             if (currentPageGetter == null)
             {
-                GameObject SCMenu = quickMenuInstance.transform.Find("ShortcutMenu").gameObject;
-                FieldInfo[] fieldInfosSC = (from fi in typeof(QuickMenu).GetFields(BindingFlags.Instance | BindingFlags.Public) where fi.FieldType == typeof(GameObject) select fi).ToArray<FieldInfo>(); // ебать какая длинная строка
-                int numSC = 0;
-                foreach (FieldInfo fieldInfo in fieldInfosSC)
-                {
-                    GameObject go = fieldInfo.GetValue(quickMenuInstance) as GameObject;
-                    IceLogger.Log(go.name);
+                GameObject shortcutMenu = quickmenu.transform.Find("ShortcutMenu").gameObject;
+                if (!shortcutMenu.activeInHierarchy)
+                    shortcutMenu = quickmenu.transform.Find("UserInteractMenu").gameObject;
 
-                    if (fieldInfo.GetValue(quickMenuInstance) as GameObject == SCMenu && ++numSC == 2)
+
+                FieldInfo[] fis = Il2CppTypeOf<QuickMenu>.Type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Where((fi) => fi.FieldType == Il2CppTypeOf<GameObject>.Type).ToArray();
+                //MelonLoader.MelonModLogger.Log("[QMStuff] GameObject Fields in QuickMenu:");
+                int count = 0;
+                foreach (FieldInfo fi in fis)
+                {
+                    GameObject value = fi.GetValue(quickmenu)?.TryCast<GameObject>();
+                    if (value == shortcutMenu && ++count == 2)
                     {
-                        currentPageGetter = fieldInfo;
+                        //MelonLoader.MelonModLogger.Log("[QMStuff] currentPage field: " + fi.Name);
+                        currentPageGetter = fi;
                         break;
                     }
                 }
-
-                GameObject UserInteractMenu = quickMenuInstance.transform.Find("UserInteractMenu").gameObject;
-                FieldInfo[] fieldInfosUInteract = (from fi in typeof(QuickMenu).GetFields(BindingFlags.Instance | BindingFlags.Public) where fi.FieldType == typeof(GameObject) select fi).ToArray<FieldInfo>();
-                int numUInteract = 0;
-                foreach (FieldInfo fieldInfo in fieldInfosUInteract)
+                if (currentPageGetter == null)
                 {
-                    if (fieldInfo.GetValue(quickMenuInstance) as GameObject == UserInteractMenu && ++numUInteract == 2)
-                    {
-                        currentPageGetter = fieldInfo;
-                        break;
-                    }
+                    Console.WriteLine("[QMStuff] Unable to find field currentPage in QuickMenu");
+                    return;
                 }
-                IceLogger.Error("[QuickMenuUtils] Unable to find field currentPage in QuickMenu");
-                return;
             }
 
-            GameObject obj = (GameObject)currentPageGetter.GetValue(quickMenuInstance);
-            if (obj != null)
-                obj.SetActive(false);
-            GetQuickMenuInstance().transform.Find("QuickMenu_NewElements/_InfoBar").gameObject.SetActive(false);
+            currentPageGetter.GetValue(quickmenu)?.Cast<GameObject>().SetActive(false);
 
-            if (quickmenuContextDisplayGetter != null)
-                quickmenuContextDisplayGetter = typeof(QuickMenu).GetFields(BindingFlags.Instance | BindingFlags.Public).FirstOrDefault((FieldInfo fi) => fi.FieldType == typeof(QuickMenuContextualDisplay));
+            GameObject infoBar = GetQuickMenuInstance().transform.Find("QuickMenu_NewElements/_InfoBar").gameObject;
+            infoBar.SetActive(pagename == "ShortcutMenu");
 
-            FieldInfo fieldInfo2 = quickmenuContextDisplayGetter;
-            QuickMenuContextualDisplay quickMenuContextualDisplay = ((fieldInfo2 != null) ? fieldInfo2.GetValue(quickMenuInstance) : null) as QuickMenuContextualDisplay;
-            if (quickMenuContextualDisplay != null)
+            QuickMenuContextualDisplay quickmenuContextualDisplay = GetQuickMenuInstance().field_Private_QuickMenuContextualDisplay_0;
+            quickmenuContextualDisplay.Method_Public_Void_EnumNPublicSealedvaUnNoToUs7vUsNoUnique_0(QuickMenuContextualDisplay.EnumNPublicSealedvaUnNoToUs7vUsNoUnique.NoSelection);
+            //quickmenuContextualDisplay.Method_Public_Nested0_0(QuickMenuContextualDisplay.Nested0.NoSelection);
+
+            pageTransform.gameObject.SetActive(true);
+
+            currentPageGetter.SetValue(quickmenu, pageTransform.gameObject);
+            if (pagename == "ShortcutMenu")
             {
-                currentPageGetter.SetValue(quickMenuInstance, transform.gameObject);
-                quickMenuContextualDisplay.Method_Public_Void_EnumNPublicSealedvaUnNoToUs7vUsNoUnique_0(0);
+                SetIndex(0);
             }
-            currentPageGetter.SetValue(quickMenuInstance, transform.gameObject);
-            quickMenuContextualDisplay.Method_Public_Void_EnumNPublicSealedvaUnNoToUs7vUsNoUnique_0(0);
-            transform.gameObject.SetActive(true);
+            else if (pagename == "UserInteractMenu")
+            {
+                SetIndex(3);
+            }
+            else
+            {
+                SetIndex(-1);
+            }
         }
+
+        // Set the current Quick Menu index
+        public static void SetIndex(int index)
+        {
+            GetQuickMenuInstance().field_Private_Int32_0 = index;
+        }
+    }
+
+    public class avatar_ui_button
+    {
+        // Token: 0x0600001C RID: 28 RVA: 0x0000278C File Offset: 0x0000098C
+        public static GameObject get_ui_button()
+        {
+            if (avatar_ui_button.avatar_button == null)
+            {
+                GameObject gameObject = GameObject.Find("/UserInterface/MenuContent/Screens/Avatar/Favorite Button");
+                GameObject gameObject2 = UnityEngine.Object.Instantiate<GameObject>(gameObject, gameObject.transform.parent);
+                gameObject2.GetComponent<Button>().onClick.RemoveAllListeners();
+                gameObject2.SetActive(false);
+                Vector3 localPosition = gameObject2.transform.localPosition;
+                gameObject2.transform.localPosition = new Vector3(localPosition.x, localPosition.y + 150f);
+                avatar_ui_button.avatar_button = gameObject2;
+            }
+            return avatar_ui_button.avatar_button;
+        }
+
+        // Token: 0x0600001D RID: 29 RVA: 0x00002810 File Offset: 0x00000A10
+        public static avatar_ui_button setup(string ButtonTitle, float x, float y, bool shownew = false)
+        {
+            avatar_ui_button avatar_ui_button = new avatar_ui_button();
+            GameObject ui_button = avatar_ui_button.get_ui_button();
+            avatar_ui_button.game_object = UnityEngine.Object.Instantiate<GameObject>(ui_button.gameObject, ui_button.transform.parent);
+            avatar_ui_button.ui_avatar_button = avatar_ui_button.game_object.GetComponentInChildren<Button>();
+            avatar_ui_button.ui_avatar_button.onClick.RemoveAllListeners();
+            Vector3 localPosition = avatar_ui_button.game_object.transform.localPosition;
+            avatar_ui_button.game_object.transform.localPosition = new Vector3(localPosition.x + x, localPosition.y + 80f * y);
+            avatar_ui_button.ui_avatar_text = avatar_ui_button.game_object.GetComponentInChildren<Text>();
+            avatar_ui_button.ui_avatar_text.text = ButtonTitle;
+            if (!shownew)
+            {
+                foreach (Component component in avatar_ui_button.game_object.GetComponentsInChildren(Il2CppTypeOf<Image>.Type))
+                {
+                    if (component.name == "Icon_New")
+                    {
+                        UnityEngine.Object.DestroyImmediate(component);
+                    }
+                }
+            }
+            avatar_ui_button.game_object.SetActive(true);
+            return avatar_ui_button;
+        }
+
+        // Token: 0x0600001E RID: 30 RVA: 0x00002930 File Offset: 0x00000B30
+        public void set_action(Action act)
+        {
+            this.ui_avatar_button.onClick = new Button.ButtonClickedEvent();
+            this.ui_avatar_button.onClick.AddListener(act);
+        }
+
+        // Token: 0x0400000B RID: 11
+        private static GameObject avatar_button;
+
+        // Token: 0x0400000C RID: 12
+        public GameObject game_object;
+
+        // Token: 0x0400000D RID: 13
+        public Button ui_avatar_button;
+
+        // Token: 0x0400000E RID: 14
+        public Text ui_avatar_text;
     }
 }

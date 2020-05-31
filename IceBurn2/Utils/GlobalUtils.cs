@@ -15,7 +15,29 @@ namespace IceBurn.Utils
         // нужные переменные сюда
         public static bool Fly = false;
         public static bool ESP = false;
+        public static int flySpeed = 5;
+        public static int walkSpeed = 2;
+        public static int cameraFOV = 65;
         public static Vector3 Gravity = Physics.gravity;
+
+        // Anti Crash preset
+        public static int max_polygons = 500000;
+        public static int max_particles = 50000;
+        public static int max_particle_sys = 50;
+        public static int max_meshes = 75;
+
+        public static void UpdatePlayerSpeed()
+        {
+            if (VRCPlayer.field_Internal_Static_VRCPlayer_0 == null)
+                return;
+            LocomotionInputController componentInChildren = PlayerWrapper.GetCurrentPlayer().GetComponentInChildren<LocomotionInputController>();
+            if (componentInChildren != null)
+            {
+                componentInChildren.runSpeed = walkSpeed;
+                componentInChildren.walkSpeed = walkSpeed;
+                componentInChildren.strafeSpeed = walkSpeed;
+            }
+        }
 
         // телепорт в точку на экране
         public static void RayTeleport()

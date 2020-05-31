@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using DiscordRPC;
 using MelonLoader;
 using IceBurn.Other;
 using IceBurn.Mod;
+using System.Diagnostics;
 
 namespace IceBurn
 {
@@ -15,7 +15,9 @@ namespace IceBurn
         {
             Addons.Add(new InputHandler());
             Addons.Add(new GUI());
+            Addons.Add(new UI());
             Addons.Add(new Discord());
+            Addons.Add(new FOVChanger());
         }
 
         public override void OnUpdate()
@@ -40,6 +42,7 @@ namespace IceBurn
         {
             foreach (var item in Addons)
                 item.OnQuit();
+            Process.GetCurrentProcess().Kill();
         }
     }
 
@@ -50,7 +53,7 @@ namespace IceBurn
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write("[");
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write(DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + "." + DateTime.Now.Millisecond);
+            Console.Write(DateTime.Now.ToString("HH:mm:ss.fff"));
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write("] [");
             Console.ForegroundColor = ConsoleColor.Blue;
@@ -66,7 +69,7 @@ namespace IceBurn
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write("[");
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write(DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + "." + DateTime.Now.Millisecond);
+            Console.Write(DateTime.Now.ToString("HH:mm:ss.fff"));
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write("] [");
             Console.ForegroundColor = ConsoleColor.Blue;

@@ -40,10 +40,15 @@ internal class DiscordRpc
     [Serializable]
     public struct JoinRequest
     {
-        public string userId;
-        public string username;
-        public string discriminator;
-        public string avatar;
+        private string userId;
+        private string username;
+        private string discriminator;
+        private string avatar;
+
+        public string UserId { get => userId; set => userId = value; }
+        public string Username { get => username; set => username = value; }
+        public string Discriminator { get => discriminator; set => discriminator = value; }
+        public string Avatar { get => avatar; set => avatar = value; }
     }
 
 

@@ -1,4 +1,6 @@
-﻿using IceBurn.Other;
+﻿using IceBurn.API;
+using IceBurn.Other;
+using IceBurn.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +16,10 @@ namespace IceBurn.Mod
         public override string Name => "User Interface";
         public override string Description => "To see elements on screen";
 
-        /*public override void OnStart()
+        public override void OnStart()
         {
-            GameObject myRoot;
+            Application.targetFrameRate = 144;
+            /*GameObject myRoot;
             GameObject myText;
             //Canvas myCanvas;
             Text text;
@@ -45,8 +48,8 @@ namespace IceBurn.Mod
             // Text position
             rectTransform = text.GetComponent<RectTransform>();
             rectTransform.localPosition = new Vector3(0, 0, 0);
-            rectTransform.sizeDelta = new Vector2(400, 200);
-        }*/
+            rectTransform.sizeDelta = new Vector2(400, 200);*/
+        }
 
         public override void OnUpdate()
         {

@@ -11,7 +11,6 @@ namespace DiscordRichPresence
         private static DiscordRpc.RichPresence presence;
         private static DiscordRpc.EventHandlers eventHandlers;
         private static bool running = false;
-        private static string uuid = "";
         private static string roomId = "";
         private static string roomSecret = "";
         private static int playersInRoom = 0;
@@ -28,8 +27,8 @@ namespace DiscordRichPresence
                     message
                 }));
             };
-            DiscordManager.presence.state = "Not in a world";
-            DiscordManager.presence.details = "Not logged in (" + (VRCTrackingManager.Method_Public_Static_Boolean_11() ? "VR" : "PC") + ")";
+            DiscordManager.presence.state = "Loading world...";
+            DiscordManager.presence.details = "Logged in (" + (VRCTrackingManager.Method_Public_Static_Boolean_11() ? "VR" : "PC") + ")";
             DiscordManager.presence.largeImageKey = "logo";
             DiscordManager.presence.partySize = 0;
             DiscordManager.presence.partyMax = 0;
@@ -41,17 +40,9 @@ namespace DiscordRichPresence
             {
                 string optionalSteamId = null;
                 ApiServerEnvironment serverEnvironment = VRCApplicationSetup.prop_VRCApplicationSetup_0.ServerEnvironment;
-                if (serverEnvironment != null)
+                if (serverEnvironment == ApiServerEnvironment.Release)
                 {
-                    if (serverEnvironment == ApiServerEnvironment.Release)
-                    {
-                        optionalSteamId = "438100";
-                        DiscordManager.presence.largeImageText = DiscordManager.presence.largeImageText + " 2";
-                    }
-                }
-                else
-                {
-                    optionalSteamId = "326100";
+                    optionalSteamId = "438100";
                     DiscordManager.presence.largeImageText = DiscordManager.presence.largeImageText + " 2";
                 }
                 DiscordRpc.Initialize("711923739188527124", ref DiscordManager.eventHandlers, true, optionalSteamId);
@@ -61,8 +52,8 @@ namespace DiscordRichPresence
             }
             catch (Exception arg)
             {
-                IceLogger.Log("[DiscordManager] Unable to init discord RichPresence:");
-                IceLogger.Log("[DiscordManager] " + arg);
+                IceLogger.Error("[DiscordManager] Unable to init discord RichPresence:");
+                IceLogger.Error("[DiscordManager] " + arg);
             }
         }
 
@@ -94,7 +85,7 @@ namespace DiscordRichPresence
                 DiscordManager.presence.smallImageKey = "desktop";
                 DiscordManager.presence.smallImageText = "Desktop";
             }
-            IceLogger.Log("[DiscordManager.DeviceChanged] isInVR: " + flag.ToString());
+            //IceLogger.Log("[DiscordManager.DeviceChanged] isInVR: " + flag.ToString());
         }
 
 
@@ -127,7 +118,7 @@ namespace DiscordRichPresence
                     {
                         str = " [Public]";
                     }
-                    else if (accessType == null)
+                    else
                     {
                         str = "";
                     }
@@ -139,7 +130,7 @@ namespace DiscordRichPresence
             }
             else
             {
-                DiscordManager.presence.state = "Not in a world";
+                DiscordManager.presence.state = "Loading world...";
                 DiscordManager.presence.partyId = "";
                 DiscordManager.presence.partyMax = 0;
                 DiscordManager.presence.startTimestamp = (long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
@@ -158,11 +149,8 @@ namespace DiscordRichPresence
             }
             if (!displayName.Equals(""))
             {
-                if (ModPrefs.GetBool("vrcdiscordpresence", "hidenameondiscord"))
-                {
-                    DiscordManager.presence.details = "Logged in (" + (VRCTrackingManager.Method_Public_Static_Boolean_11() ? "VR" : "PC") + ")";
-                }
-                else
+                DiscordManager.presence.details = "Logged in (" + (VRCTrackingManager.Method_Public_Static_Boolean_11() ? "VR" : "PC") + ")";
+                /*else
                 {
                     DiscordManager.presence.details = string.Concat(new string[]
                     {
@@ -172,11 +160,10 @@ namespace DiscordRichPresence
                         VRCTrackingManager.Method_Public_Static_Boolean_11() ? "VR" : "PC",
                         ")"
                     });
-                }
+                }*/
                 DiscordRpc.UpdatePresence(ref DiscordManager.presence);
                 return;
             }
-            DiscordManager.presence.details = "Not logged in (" + (VRCTrackingManager.Method_Public_Static_Boolean_11() ? "VR" : "PC") + ")";
             DiscordManager.RoomChanged("", "", "", 0, 0);
         }
 
@@ -200,12 +187,12 @@ namespace DiscordRichPresence
             }
             APIUser currentUser = APIUser.CurrentUser;
             string b = ((currentUser != null) ? currentUser.id : null) ?? "";
-            if (DiscordManager.uuid != b || ModPrefs.GetBool("vrcdiscordpresence", "hidenameondiscord"))
+            /*if (DiscordManager.uuid != b || ModPrefs.GetBool("vrcdiscordpresence", "hidenameondiscord"))
             {
                 DiscordManager.uuid = b;
                 APIUser currentUser2 = APIUser.CurrentUser;
                 DiscordManager.UserChanged(((currentUser2 != null) ? currentUser2.displayName : null) ?? "");
-            }
+            }*/
             string text = "";
             ApiWorld currentRoom = RoomManagerBase.field_Internal_Static_ApiWorld_0;
             if (((currentRoom != null) ? currentRoom.currentInstanceIdOnly : null) != null)
