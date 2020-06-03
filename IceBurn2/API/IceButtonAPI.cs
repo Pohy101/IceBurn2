@@ -681,7 +681,7 @@ namespace IceBurn.API
                     shortcutMenu = quickmenu.transform.Find("UserInteractMenu").gameObject;
 
 
-                FieldInfo[] fis = Il2CppTypeOf<QuickMenu>.Type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Where((fi) => fi.FieldType == Il2CppTypeOf<GameObject>.Type).ToArray();
+                FieldInfo[] fis = Il2CppType.Of<QuickMenu>().GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Where((fi) => fi.FieldType == Il2CppType.Of<GameObject>()).ToArray();
                 //MelonLoader.MelonModLogger.Log("[QMStuff] GameObject Fields in QuickMenu:");
                 int count = 0;
                 foreach (FieldInfo fi in fis)
@@ -732,69 +732,5 @@ namespace IceBurn.API
         {
             GetQuickMenuInstance().field_Private_Int32_0 = index;
         }
-    }
-
-    public class avatar_ui_button
-    {
-        // Token: 0x0600001C RID: 28 RVA: 0x0000278C File Offset: 0x0000098C
-        public static GameObject get_ui_button()
-        {
-            if (avatar_ui_button.avatar_button == null)
-            {
-                GameObject gameObject = GameObject.Find("/UserInterface/MenuContent/Screens/Avatar/Favorite Button");
-                GameObject gameObject2 = UnityEngine.Object.Instantiate<GameObject>(gameObject, gameObject.transform.parent);
-                gameObject2.GetComponent<Button>().onClick.RemoveAllListeners();
-                gameObject2.SetActive(false);
-                Vector3 localPosition = gameObject2.transform.localPosition;
-                gameObject2.transform.localPosition = new Vector3(localPosition.x, localPosition.y + 150f);
-                avatar_ui_button.avatar_button = gameObject2;
-            }
-            return avatar_ui_button.avatar_button;
-        }
-
-        // Token: 0x0600001D RID: 29 RVA: 0x00002810 File Offset: 0x00000A10
-        public static avatar_ui_button setup(string ButtonTitle, float x, float y, bool shownew = false)
-        {
-            avatar_ui_button avatar_ui_button = new avatar_ui_button();
-            GameObject ui_button = avatar_ui_button.get_ui_button();
-            avatar_ui_button.game_object = UnityEngine.Object.Instantiate<GameObject>(ui_button.gameObject, ui_button.transform.parent);
-            avatar_ui_button.ui_avatar_button = avatar_ui_button.game_object.GetComponentInChildren<Button>();
-            avatar_ui_button.ui_avatar_button.onClick.RemoveAllListeners();
-            Vector3 localPosition = avatar_ui_button.game_object.transform.localPosition;
-            avatar_ui_button.game_object.transform.localPosition = new Vector3(localPosition.x + x, localPosition.y + 80f * y);
-            avatar_ui_button.ui_avatar_text = avatar_ui_button.game_object.GetComponentInChildren<Text>();
-            avatar_ui_button.ui_avatar_text.text = ButtonTitle;
-            if (!shownew)
-            {
-                foreach (Component component in avatar_ui_button.game_object.GetComponentsInChildren(Il2CppTypeOf<Image>.Type))
-                {
-                    if (component.name == "Icon_New")
-                    {
-                        UnityEngine.Object.DestroyImmediate(component);
-                    }
-                }
-            }
-            avatar_ui_button.game_object.SetActive(true);
-            return avatar_ui_button;
-        }
-
-        // Token: 0x0600001E RID: 30 RVA: 0x00002930 File Offset: 0x00000B30
-        public void set_action(Action act)
-        {
-            this.ui_avatar_button.onClick = new Button.ButtonClickedEvent();
-            this.ui_avatar_button.onClick.AddListener(act);
-        }
-
-        // Token: 0x0400000B RID: 11
-        private static GameObject avatar_button;
-
-        // Token: 0x0400000C RID: 12
-        public GameObject game_object;
-
-        // Token: 0x0400000D RID: 13
-        public Button ui_avatar_button;
-
-        // Token: 0x0400000E RID: 14
-        public Text ui_avatar_text;
     }
 }

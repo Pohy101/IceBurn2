@@ -5,7 +5,7 @@ using System.Net;
 using MelonLoader;
 using DiscordRichPresence;
 
-namespace IceBurn.Other
+namespace IceBurn.Mod.Other
 {
     class otherrrrr : MelonMod
     {

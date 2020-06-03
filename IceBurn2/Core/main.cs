@@ -1,9 +1,13 @@
 ﻿using System;
+using Console = System.Console;
 using System.Collections.Generic;
 using MelonLoader;
 using IceBurn.Other;
-using IceBurn.Mod;
 using System.Diagnostics;
+using UnityEngine;
+using Il2CppSystem.Threading;
+using IceBurn.Mod.Other;
+using IceBurn.Mod.InputHandler;
 
 namespace IceBurn
 {
@@ -14,10 +18,12 @@ namespace IceBurn
         public override void OnApplicationStart()
         {
             Addons.Add(new InputHandler());
-            Addons.Add(new GUI());
-            Addons.Add(new UI());
+            Addons.Add(new Mod.GUI());
+            Addons.Add(new Mod.UI());
             Addons.Add(new Discord());
             Addons.Add(new FOVChanger());
+            Addons.Add(new Mod.AvFav.UI());
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
         }
 
         public override void OnUpdate()
@@ -26,14 +32,27 @@ namespace IceBurn
                 item.OnUpdate();
         }
 
+        public override void OnGUI()
+        {
+            foreach (var item in Addons)
+                item.OnGUI();
+        }
+
         public override void OnFixedUpdate()
         {
             foreach (var item in Addons)
                 item.OnFixedUpdate();
         }
 
+        public override void OnLateUpdate()
+        {
+            foreach (var item in Addons)
+                item.OnLateUpdate();
+        }
+
         public override void VRChat_OnUiManagerInit()
         {
+            Application.targetFrameRate = 144;
             foreach (var item in Addons)
                 item.OnStart();
         }
@@ -42,6 +61,7 @@ namespace IceBurn
         {
             foreach (var item in Addons)
                 item.OnQuit();
+            Thread.Sleep(500);
             Process.GetCurrentProcess().Kill();
         }
     }

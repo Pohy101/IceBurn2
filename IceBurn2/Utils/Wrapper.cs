@@ -6,8 +6,7 @@ using System.Net;
 using System.Net.Cache;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
+using UnhollowerBaseLib;
 using UnityEngine;
 using VRC;
 using VRC.Core;
@@ -17,6 +16,7 @@ namespace IceBurn.Utils
     public static class PlayerWrapper
     {
         public static List<string> friend_list = new List<string>();
+        private static float last_friend_update = 0f;
 
         public static VRCPlayer GetCurrentPlayer()
         {
@@ -48,14 +48,73 @@ namespace IceBurn.Utils
             return Foundplayer;
         }
 
+        public static void RemoveAvatar(Player user)
+        {
+            Il2CppArrayBase<MeshFilter> componentsInChildren = user.GetComponentsInChildren<MeshFilter>();
+            foreach (MeshFilter meshFilter in componentsInChildren)
+                UnityEngine.Object.Destroy(meshFilter);
+        }
+
+        public static void HideAvatar(Player user)
+        {
+            Il2CppArrayBase<MeshFilter> componentsInChildren = user.GetComponentsInChildren<MeshFilter>();
+            foreach (MeshFilter meshFilter in componentsInChildren)
+                meshFilter.gameObject.SetActive(false);
+                
+        }
+        public static void ShowAvatar(Player user)
+        {
+            Il2CppArrayBase<MeshFilter> componentsInChildren = user.GetComponentsInChildren<MeshFilter>();
+            foreach (MeshFilter meshFilter in componentsInChildren)
+                meshFilter.gameObject.SetActive(true);
+        }
+
+        public static void UpdateFriendList()
+        {
+            if (Time.time > last_friend_update)
+            {
+                last_friend_update = Time.time + 10f;
+                friend_list.Clear();
+                for (int i = 0; i < APIUser.CurrentUser.friendIDs.Count; i++)
+                {
+                    string item = APIUser.CurrentUser.friendIDs[i];
+                    friend_list.Add(item);
+                }
+            }
+        }
+
         public static ulong GetSteamID (this VRCPlayer player)
         {
             return player.field_Private_UInt64_0;
         }
 
-        public static bool is_friend(Player p)
+        public static bool isFriend(Player p)
         {
             return friend_list.Contains(p.field_Private_APIUser_0.id);
+        }
+
+        public static string GetTrustLevel(Player p)
+        {
+            try
+            {
+                if (p.field_Private_APIUser_0.hasLegendTrustLevel)
+                    return "Veteran user";
+                if (p.field_Private_APIUser_0.hasVeteranTrustLevel)
+                    return "Trusted user";
+                if (p.field_Private_APIUser_0.hasTrustedTrustLevel)
+                    return "Known user";
+                if (p.field_Private_APIUser_0.hasKnownTrustLevel)
+                    return "User";
+                if (p.field_Private_APIUser_0.hasBasicTrustLevel)
+                    return "New user";
+                if (p.field_Private_APIUser_0.isUntrusted)
+                    return "Visitor";
+            }
+            catch (Exception)
+            {
+                return "unknown";
+            }
+            return "unknown";
         }
     }
 

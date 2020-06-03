@@ -2,7 +2,7 @@
 using IceBurn.Utils;
 using UnityEngine;
 
-namespace IceBurn.Mod
+namespace IceBurn.Mod.Other
 {
     class FOVChanger : VRmod
     {

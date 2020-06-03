@@ -9,30 +9,47 @@ using VRC.Core;
 using VRC;
 using VRC.UI;
 using System.Diagnostics;
+using IceBurn.Mod.Other;
+using System.Windows.Forms;
+using UnityEngine.Experimental.UIElements.StyleEnums;
 
 namespace IceBurn.Mod
 {
     class UI : VRmod
     {
-        public override string Name => "User Interface";
-        public override string Description => "creates buttons in User Interface";
+        public override string Name => "QM User Interface";
+        public override string Description => "creates buttons in QM User Interface";
 
         // Менюшки
         public static QMNestedButton mainMenuP1;
         public static QMNestedButton mainMenuP2;
+        public static QMNestedButton mainMenuP3;
         public static QMNestedButton flyMenu;
         public static QMNestedButton FOVChangerMenu;
         public static QMNestedButton teleportMenu;
         public static QMNestedButton followMenu;
         public static QMNestedButton speedHackMenu;
+        public static QMNestedButton userUtilsMenu;
+        public static QMNestedButton brightnessMenu;
 
         // Кнопки Основного меню
         public static QMToggleButton toggleESP;
         public static QMToggleButton toggleEarRape;
-        public static QMSingleButton deleteAllPortals;
-        public static QMToggleButton toggleFakeNameSpaces;
+        public static QMSingleButton hideAllPortals;
+        public static QMToggleButton toggleFakeNamePlate;
         public static QMToggleButton toggleAudioBitrate;
         public static QMSingleButton reconnectInstance;
+        public static QMSingleButton test;
+
+        // Кнопки Второго меню
+        public static QMSingleButton addJump;
+        public static QMSingleButton deleteAllPortals;
+        public static QMToggleButton toggleShadows;
+        public static QMToggleButton toggleOptimizeMirror;
+        public static QMSingleButton hideAllVisitors;
+        public static QMToggleButton hideAllObjects;
+        public static QMSingleButton selfCrashCheck;
+        public static QMToggleButton invalid;
 
         // Кнопки Fly
         public static QMSingleButton resetflySpeed;
@@ -50,6 +67,11 @@ namespace IceBurn.Mod
         public static QMHalfButton FOVUpX;
         public static QMHalfButton FOVDownX;
 
+        // Кнопки brightnessMenu
+        public static QMSingleButton resetBrightness;
+        public static QMHalfButton brightnessUp;
+        public static QMHalfButton brightnessDown;
+
         // Кнопки SpeedHack
         public static QMSingleButton resetWalkSpeed;
         public static QMHalfButton WalkSpeedUp;
@@ -58,10 +80,12 @@ namespace IceBurn.Mod
         public static QMHalfButton WalkSpeedDownX;
         public static QMSingleButton ohShiitWalk;
 
-        // Другие кнопки
+        // Кнопки User
         public static QMSingleButton forceClone;
         public static QMSingleButton crashCheck;
         public static QMSingleButton downloadVRCA;
+
+        // Другие кнопки
         public static QMSingleButton quitApp;
 
         public override void OnStart()
@@ -69,12 +93,16 @@ namespace IceBurn.Mod
             // Инициализация меню
             mainMenuP1 = new QMNestedButton("ShortcutMenu", 5, 2, "Utils", "Ice Burn Utils");
             mainMenuP2 = new QMNestedButton(mainMenuP1, 5, 1, "Next\nPage", "Page 2");
+            mainMenuP3 = new QMNestedButton(mainMenuP2, 5, 1, "Next\nPage", "Page 3");
             flyMenu = new QMNestedButton(mainMenuP1, 1, 0, "Fly\nMenu", "Fly Menu");
             FOVChangerMenu = new QMNestedButton(mainMenuP1, 1, 1, "FOV\nMenu", "Field Of View Menu");
             speedHackMenu = new QMNestedButton(mainMenuP1, 1, 2, "Player\nSpeed", "Speed Hack Menu");
+            brightnessMenu = new QMNestedButton(mainMenuP2, 1, 1, "Light\nIntensity", "Set Light Intensity");
+            userUtilsMenu = new QMNestedButton("UserInteractMenu", 4, 2, "Utils", "User Utils");
 
             // Это просто нужно
             mainMenuP2.getBackButton().setButtonText("Previous\nPage");
+            mainMenuP3.getBackButton().setButtonText("Previous\nPage");
 
             // Инициализация кнопок
             resetflySpeed = new QMSingleButton(flyMenu, 2, 0, "Reset\nSpeed\n[" + GlobalUtils.flySpeed + "]", new Action(() =>
@@ -145,13 +173,15 @@ namespace IceBurn.Mod
             {
                 GlobalUtils.ESP = true;
 
-                GameObject[] array = GameObject.FindGameObjectsWithTag("Player");
-                for (int i = 0; i < array.Length; i++)
+                var allPlayers = PlayerWrapper.GetAllPlayers(Wrapper.GetPlayerManager()).ToArray();
+                for (int i = 0; i < allPlayers.Length; i++)
                 {
-                    Transform sRegion = array[i].transform.Find("SelectRegion");
+                    Transform sRegion = allPlayers[i].transform.Find("SelectRegion");
                     if (sRegion != null)
                     {
                         sRegion.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Color.red);
+                        Renderer testRenderer = allPlayers[i].field_Internal_VRCPlayer_0.namePlate.gameObject.GetComponent<Renderer>();
+                        HighlightsFX.prop_HighlightsFX_0.EnableOutline(testRenderer, GlobalUtils.ESP);
                         HighlightsFX.prop_HighlightsFX_0.EnableOutline(sRegion.GetComponent<Renderer>(), GlobalUtils.ESP);
                     }
                 }
@@ -161,14 +191,25 @@ namespace IceBurn.Mod
             {
                 GlobalUtils.ESP = false;
 
-                GameObject[] array = GameObject.FindGameObjectsWithTag("Player");
-                for (int i = 0; i < array.Length; i++)
+                var allPlayers = PlayerWrapper.GetAllPlayers(Wrapper.GetPlayerManager()).ToArray();
+                for (int i = 0; i < allPlayers.Length; i++)
                 {
-                    Transform sRegion = array[i].transform.Find("SelectRegion");
+                    Transform sRegion = allPlayers[i].transform.Find("SelectRegion");
                     if (sRegion != null)
                     {
                         sRegion.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Color.red);
                         HighlightsFX.prop_HighlightsFX_0.EnableOutline(sRegion.GetComponent<Renderer>(), GlobalUtils.ESP);
+                    }
+                }
+
+                // Поиск и добавление обьектов в ESP И СУКА ПОЧЕМУ ТО ОНО НЕ РАБОТАЕТ!
+                foreach (VRC_Pickup pickup in Resources.FindObjectsOfTypeAll<VRC_Pickup>())
+                {
+                    if (pickup.gameObject.transform.Find("SelectRegion"))
+                    {
+                        pickup.gameObject.transform.Find("SelectRegion").GetComponent<Renderer>().sharedMaterial.SetColor("_HighlightColor", Color.red);
+                        Wrapper.GetHighlightsFX().EnableOutline(pickup.gameObject.transform.Find("SelectRegion").GetComponent<Renderer>(), GlobalUtils.ESP);
+                        //HighlightsFX.prop_HighlightsFX_0.field_Protected_Material_0.SetColor("_HighlightColor", Color.red);
                     }
                 }
                 IceLogger.Log("ESP has been Disabled");
@@ -185,7 +226,7 @@ namespace IceBurn.Mod
                 IceLogger.Log("EarRape Disabled");
             }), "Toggle EarRape");
 
-            forceClone = new QMSingleButton("UserInteractMenu", 4, 2, "Force\nClone", new Action(() =>
+            forceClone = new QMSingleButton(userUtilsMenu, 1, 0, "Force\nClone", new Action(() =>
             {
                 try
                 {
@@ -195,6 +236,7 @@ namespace IceBurn.Mod
                         new PageAvatar { avatar = new SimpleAvatarPedestal { field_Internal_ApiAvatar_0 = new ApiAvatar { id = avatar.id } } }.ChangeToSelectedAvatar();
                     else
                         IceLogger.Log("Avatar release status is PRIVATE!");
+                    IceLogger.Log(avatar.id);
                 }
                 catch (Exception)
                 {
@@ -203,7 +245,7 @@ namespace IceBurn.Mod
                 }
             }), "Force Clone User Avatar");
 
-            crashCheck = new QMSingleButton("UserInteractMenu", 3, 3, "Crash\nCheck", new Action(() =>
+            crashCheck = new QMSingleButton(userUtilsMenu, 2, 0, "Crash\nCheck", new Action(() =>
             {
                 anticrash.particle_check(Wrapper.GetQuickMenu().GetSelectedPlayer());
                 anticrash.polygon_check(Wrapper.GetQuickMenu().GetSelectedPlayer(), Wrapper.get_poly(Wrapper.GetQuickMenu().GetSelectedPlayer()));
@@ -214,28 +256,11 @@ namespace IceBurn.Mod
                 IceLogger.Log("Player Checked");
             }), "Force Clone User Avatar");
 
-            downloadVRCA = new QMSingleButton("UserInteractMenu", 4, 3, "Download\nVRCA", new Action(() =>
+            downloadVRCA = new QMSingleButton(userUtilsMenu, 3, 0, "Download\nVRCA", new Action(() =>
             {
-                Process.Start(Wrapper.GetQuickMenu().GetSelectedPlayer().field_Private_VRCAvatarManager_0.field_Private_AvatarPerformanceStats_0.field_Public_String_0);
+                //Process.Start(Wrapper.GetQuickMenu().GetSelectedPlayer().field_Private_VRCAvatarManager_0.field_Private_AvatarPerformanceStats_0.field_Public_String_0);
+                Process.Start(Wrapper.GetQuickMenu().GetSelectedPlayer().field_Internal_VRCPlayer_0.prop_ApiAvatar_0.assetUrl);
             }), "Force Clone User Avatar");
-
-            /*resetSelectedPlayerVolume = new QMSingleButton("UserInteractMenu", 1, 3, "Reset\nVolume\n[]", new Action(() =>
-            {
-                Wrapper.GetSelectedPlayer(Wrapper.GetQuickMenu()).field_Private_USpeaker_0.SpeakerVolume = 1f;
-                resetSelectedPlayerVolume.setButtonText("Reset\nVolume\n[" + Wrapper.GetSelectedPlayer(Wrapper.GetQuickMenu()).field_Private_USpeaker_0.SpeakerVolume + "]");
-            }), "Reset " + Wrapper.GetSelectedPlayer(Wrapper.GetQuickMenu()).field_Private_String_0 + " Volume [100]");
-
-            selectedPlayerVolumeUp = new QMHalfButton("UserInteractMenu", 2, 2.5f, "▲", new Action(() =>
-            {
-                Wrapper.GetSelectedPlayer(Wrapper.GetQuickMenu()).field_Private_USpeaker_0.SpeakerVolume += 0.1f;
-                resetSelectedPlayerVolume.setButtonText("Reset\nVolume\n[" + Wrapper.GetSelectedPlayer(Wrapper.GetQuickMenu()).field_Private_USpeaker_0.SpeakerVolume + "]");
-            }), "Selected Player Volume Up");
-
-            selectedPlayerVolumeDown = new QMHalfButton("UserInteractMenu", 2, 3.5f, "▼", new Action(() =>
-            {
-                Wrapper.GetSelectedPlayer(Wrapper.GetQuickMenu()).field_Private_USpeaker_0.SpeakerVolume -= 0.1f;
-                resetSelectedPlayerVolume.setButtonText("Reset\nVolume\n[" + Wrapper.GetSelectedPlayer(Wrapper.GetQuickMenu()).field_Private_USpeaker_0.SpeakerVolume + "]");
-            }), "Selected Player Volume Up");*/
 
             teleportMenu = new QMNestedButton(mainMenuP1, 2, 0, "Teleport", new Action(() =>
             {
@@ -311,7 +336,7 @@ namespace IceBurn.Mod
 
             quitApp = new QMSingleButton("UIElementsMenu", 5, 2, "Quit\nGame", new Action(() =>
             {
-                Application.Quit();
+                UnityEngine.Application.Quit();
             }), "Quit Game", null, Color.red);
 
             ohShiitFly = new QMSingleButton(flyMenu, 1, 2, "SHEEET", new Action(() =>
@@ -362,41 +387,34 @@ namespace IceBurn.Mod
                 resetWalkSpeed.setButtonText("Reset\nSpeed\n[" + GlobalUtils.walkSpeed + "]");
             }), "OH SHEEEEEEEEEEEEEEEEEEEET");
 
-            deleteAllPortals = new QMSingleButton(mainMenuP1, 3, 1, "Delete\nPortals", new Action(() =>
+            deleteAllPortals = new QMSingleButton(mainMenuP2, 2, 0, "Delete\nPortals", new Action(() =>
             {
                 (from portal in Resources.FindObjectsOfTypeAll<PortalInternal>()
                  where portal.gameObject.activeInHierarchy && !portal.gameObject.GetComponentInParent<VRC_PortalMarker>()
                  select portal).ToList<PortalInternal>().ForEach(delegate (PortalInternal p)
                  {
                      Player component = Networking.GetOwner(p.gameObject).gameObject.GetComponent<Player>();
-                     if (component != null && PlayerWrapper.is_friend(component))
-                     {
-                         return;
-                     }
                      UnityEngine.Object.Destroy(p.transform.root.gameObject);
                  });
             }), "Delete All Portals");
 
-            toggleFakeNameSpaces = new QMToggleButton(mainMenuP1, 4, 1, "Fake NameSpace", new Action(() =>
+            hideAllPortals = new QMSingleButton(mainMenuP1, 3, 1, "Hide\nPortals", new Action(() =>
             {
-                var allPlayers = PlayerWrapper.GetAllPlayers(Wrapper.GetPlayerManager());
-                for (int i = 0; i < allPlayers.Count; i++)
-                    allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.red);
-            }), "RealNameSpace", new Action(() =>
+                (from portal in Resources.FindObjectsOfTypeAll<PortalInternal>()
+                 where portal.gameObject.activeInHierarchy && !portal.gameObject.GetComponentInParent<VRC_PortalMarker>()
+                 select portal).ToList<PortalInternal>().ForEach(delegate (PortalInternal p)
+                 {
+                     Player component = Networking.GetOwner(p.gameObject).gameObject.GetComponent<Player>();
+                     p.transform.root.gameObject.SetActive(false);
+                 });
+            }), "Hide All Portals");
+
+            toggleFakeNamePlate = new QMToggleButton(mainMenuP1, 4, 1, "Fake Nameplate", new Action(() =>
             {
-                var allPlayers = PlayerWrapper.GetAllPlayers(Wrapper.GetPlayerManager());
-                for (int i = 0; i < allPlayers.Count; i++)
-                {
-                    IceLogger.Log("field_Private_String_0: " + allPlayers[i].field_Internal_VRCPlayer_0);
-                    IceLogger.Log("field_Private_APIUser_0: " + allPlayers[i].field_Private_APIUser_0);
-                    IceLogger.Log("field_Private_VRCAvatarManager_0: " + allPlayers[i].field_Private_VRCAvatarManager_0);
-                    IceLogger.Log("field_Private_VRCPlayerApi_0: " + allPlayers[i].field_Private_VRCPlayerApi_0);
-                    IceLogger.Log("prop_VRCPlayerApi_0: " + allPlayers[i].prop_VRCPlayerApi_0);
-                    IceLogger.Log("prop_String_0: " + allPlayers[i].prop_String_0);
-                    IceLogger.Log("prop_String_1: " + allPlayers[i].prop_String_1);
-                    IceLogger.Log("tag: " + allPlayers[i].tag);
-                    //allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.red);
-                }
+                GlobalUtils.FakeNamePlate = true;
+            }), "Real Nameplate", new Action(() =>
+            {
+                GlobalUtils.FakeNamePlate = false;
             }), "Toggle Fake NameSpace");
 
             toggleAudioBitrate = new QMToggleButton(mainMenuP1, 2, 2, "64kbps", new Action(() =>
@@ -411,6 +429,171 @@ namespace IceBurn.Mod
             {
                 Networking.GoToRoom(Wrapper.GetInstance().instanceWorld.id + ":" + Wrapper.GetInstance().instanceWorld.currentInstanceIdWithTags);
             }), "Reconnect to instance");
+
+            test = new QMSingleButton(mainMenuP1, 4, 2, "Test", new Action(() =>
+            {
+                /*var allPlayers = Wrapper.GetPlayerManager().GetAllPlayers().ToArray();
+                for (int i = 0; i < allPlayers.Length; i++)
+                {
+                    IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_0);
+                    IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_1);
+                    var usertags = allPlayers[i].GetAPIUser().tags;
+                    foreach (var tags in usertags)
+                    {
+                        IceLogger.Log(allPlayers[i].ToString() + " " + tags);
+                    }
+                    //Status: IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.field_Internal_String_1.ToString());
+                }*/
+                var allPlayers = Wrapper.GetPlayerManager().GetAllPlayers().ToArray();
+                for (int i = 0; i < allPlayers.Length; i++)
+                {
+                    float distance = Vector3.Distance(PlayerWrapper.GetCurrentPlayer().transform.position, allPlayers[i].transform.position);
+                    IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_0 + ": " + distance);
+
+                    IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_0 + ": " + allPlayers[i].field_Internal_VRCPlayer_0.prop_String_1);
+                    var usertags = allPlayers[i].GetAPIUser().tags;
+                    foreach (var tags in usertags)
+                    {
+                        IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_0 + ": " + tags);
+                    }
+                }
+            }), "Test");
+
+            toggleShadows = new QMToggleButton(mainMenuP2, 3, 0, "Shadows ON", new Action(() =>
+            {
+                foreach (Light light in Resources.FindObjectsOfTypeAll<Light>())
+                {
+                    light.shadows = LightShadows.Soft;
+                    light.m_BakedIndex = 0;
+                    light.shadowResolution = UnityEngine.Rendering.LightShadowResolution.High;
+                }
+            }), "Shadows OFF", new Action(() =>
+            {
+                foreach (Light light in Resources.FindObjectsOfTypeAll<Light>())
+                {
+                    light.shadows = LightShadows.None;
+                }
+            }), "Toggle Shadows on map");
+
+            addJump = new QMSingleButton(mainMenuP2, 1, 0, "Add\nJump", new Action(() =>
+            {
+                PlayerWrapper.GetCurrentPlayer().gameObject.AddComponent<PlayerModComponentJump>();
+            }), "Add JumpComponent to you");
+
+            toggleOptimizeMirror = new QMToggleButton(mainMenuP2, 4, 0, "Optimized Mirror", new Action(() =>
+            {
+                MirrorReflection[] array = UnityEngine.Object.FindObjectsOfType<MirrorReflection>();
+                LayerMask mask = new LayerMask();
+                mask.value = 263680;
+
+                for (int i = 0; i < array.Length; i++)
+                {
+                    array[i].m_ReflectLayers = mask;//.value = 263680;
+                }
+                VRCSDK2.VRC_MirrorReflection[] array2 = UnityEngine.Object.FindObjectsOfType<VRCSDK2.VRC_MirrorReflection>();
+                for (int i = 0; i < array2.Length; i++)
+                {
+                    array2[i].m_ReflectLayers = mask;//.value = 263680;
+                }
+
+                VRC_MirrorReflection[] array4 = UnityEngine.Object.FindObjectsOfType<VRC_MirrorReflection>();
+                for (int i = 0; i < array4.Length; i++)
+                {
+                    array4[i].m_ReflectLayers = mask;//.value = -1025;
+                }
+            }), "Normal Mirror", new Action(() =>
+            {
+                MirrorReflection[] array = UnityEngine.Object.FindObjectsOfType<MirrorReflection>();
+                LayerMask mask = new LayerMask();
+                mask.value = -1025;
+
+                for (int i = 0; i < array.Length; i++)
+                {
+                    array[i].m_ReflectLayers = mask;//.value = 263680;
+                }
+                VRCSDK2.VRC_MirrorReflection[] array2 = UnityEngine.Object.FindObjectsOfType<VRCSDK2.VRC_MirrorReflection>();
+                for (int i = 0; i < array2.Length; i++)
+                {
+                    array2[i].m_ReflectLayers = mask;//.value = 263680;
+                }
+
+                VRC_MirrorReflection[] array4 = UnityEngine.Object.FindObjectsOfType<VRC_MirrorReflection>();
+                for (int i = 0; i < array4.Length; i++)
+                {
+                    array4[i].m_ReflectLayers = mask;//.value = -1025;
+                }
+            }), "Toggle Shadows on map");
+
+            brightnessUp = new QMHalfButton(brightnessMenu, 2, -0.5f, "▲", new Action(() =>
+            {
+                GlobalUtils.brightness += 0.1f;
+                foreach (Light light in Resources.FindObjectsOfTypeAll<Light>())
+                {
+                    light.intensity = GlobalUtils.brightness;
+                }
+                resetBrightness.setButtonText("Reset\nBrightness\n[" + GlobalUtils.brightness + "]");
+            }), "Brightness Up");
+
+            brightnessDown = new QMHalfButton(brightnessMenu, 2, 0.5f, "▼", new Action(() =>
+            {
+                GlobalUtils.brightness -= 0.1f;
+                foreach (Light light in Resources.FindObjectsOfTypeAll<Light>())
+                {
+                    light.intensity = GlobalUtils.brightness;
+                }
+                resetBrightness.setButtonText("Reset\nBrightness\n[" + GlobalUtils.brightness + "]");
+            }), "Brightness Down");
+
+            resetBrightness = new QMSingleButton(brightnessMenu, 1, 0, "Reset\nBrightness\n[" + GlobalUtils.brightness + "]", new Action(() =>
+            {
+                GlobalUtils.brightness = 1f;
+                foreach (Light light in Resources.FindObjectsOfTypeAll<Light>())
+                {
+                    light.intensity = GlobalUtils.brightness;
+                }
+                resetBrightness.setButtonText("Reset\nBrightness\n[" + GlobalUtils.brightness + "]");
+            }), "Reset To Default Brightness");
+
+            hideAllVisitors = new QMSingleButton(mainMenuP2, 2, 1, "Remove\nVisitors", new Action(() =>
+            {
+                var allPlayers = Wrapper.GetPlayerManager().GetAllPlayers().ToArray();
+                for (int i = 0; i < allPlayers.Length; i++)
+                {
+                    if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Visitor")
+                    {
+                        PlayerWrapper.RemoveAvatar(allPlayers[i].field_Internal_VRCPlayer_0.field_Private_Player_0);
+                        UnityEngine.GameObject.Destroy(allPlayers[i].field_Internal_VRCPlayer_0.namePlate.gameObject);
+                    }
+                }
+            }), "Show Visitors");
+            hideAllObjects = new QMToggleButton(mainMenuP2, 3, 1, "Hide Objects", new Action(() =>
+            {
+                foreach (VRC_Pickup pickup in Resources.FindObjectsOfTypeAll<VRC_Pickup>())
+                    pickup.gameObject.GetComponent<MeshRenderer>().enabled = false;
+            }), "Show Objects", new Action(() =>
+            {
+                foreach (VRC_Pickup pickup in Resources.FindObjectsOfTypeAll<VRC_Pickup>())
+                    pickup.gameObject.GetComponent<MeshRenderer>().enabled = true;
+            }), "Toggle VRC_Pickup Objects");
+
+            selfCrashCheck = new QMSingleButton(mainMenuP2, 4, 1, "Self\nCrash\nCheck", new Action(() =>
+            {
+                anticrash.particle_check(PlayerWrapper.GetCurrentPlayer().prop_Player_0);
+                anticrash.polygon_check(PlayerWrapper.GetCurrentPlayer().prop_Player_0, Wrapper.get_poly(PlayerWrapper.GetCurrentPlayer().prop_Player_0));
+                anticrash.shader_check(PlayerWrapper.GetCurrentPlayer().prop_Player_0);
+                anticrash.mesh_check(PlayerWrapper.GetCurrentPlayer().prop_Player_0);
+                anticrash.mats_check(PlayerWrapper.GetCurrentPlayer().prop_Player_0);
+                anticrash.work_hk(PlayerWrapper.GetCurrentPlayer().prop_Player_0, Wrapper.get_poly(PlayerWrapper.GetCurrentPlayer().prop_Player_0));
+                IceLogger.Log("Player " + PlayerWrapper.GetCurrentPlayer().prop_Player_0.field_Private_String_0 + " Checked");
+            }), "Self Crash Check");
+
+            invalid = new QMToggleButton(mainMenuP2, 1, 2, "Invalid?", new Action(() =>
+            {
+                UnityEngine.Application.targetFrameRate = 10;
+            }), "Maybe", new Action(() =>
+            {
+                UnityEngine.Application.targetFrameRate = 144;
+            }), "Are you invalid blyat?");
 
             // Initial State
             toggleFly.setToggleState(false);

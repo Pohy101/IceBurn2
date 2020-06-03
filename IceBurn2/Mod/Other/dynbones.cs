@@ -1,4 +1,7 @@
-﻿/*using System;
+﻿using System.Collections.Generic;
+using UnhollowerBaseLib;
+using UnityEngine;
+/*using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -658,13 +661,7 @@ namespace DBMod
 }
 */
 
-using System;
-using System.Collections.Generic;
-using MelonLoader;
-using UnhollowerBaseLib;
-using UnityEngine;
-
-namespace IceBurn.Mod
+namespace IceBurn.Mod.Other
 {
 	// Token: 0x0200001D RID: 29
 	public class dynbones

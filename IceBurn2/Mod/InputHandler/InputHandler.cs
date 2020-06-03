@@ -1,35 +1,79 @@
 ﻿using IceBurn.Other;
 using IceBurn.Utils;
-using MelonLoader;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC;
 using VRC.Core;
 using VRC.UI;
-using System.Threading;
 
-namespace IceBurn.Mod
+namespace IceBurn.Mod.InputHandler
 {
     class InputHandler : VRmod
     {
         public override string Name => "Inputs";
         public override string Description => "Inputs handling from here";
 
-        // Инициализация
-        public InputHandler() : base()
-        {
-
-        }
-
         public override void OnStart()
         {
 
         }
+
+        void RNPlates(bool state)
+        {
+            try
+            {
+                if (!state)
+                {
+                    var allPlayers = Wrapper.GetPlayerManager().GetAllPlayers().ToArray();
+                    for (int i = 0; i < allPlayers.Length; i++)
+                    {
+                        Transform sRegion = allPlayers[i].transform.Find("SelectRegion");
+                        allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.white;
+                        allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.white;
+                        allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.black;
+
+                        if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Veteran user")
+                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * 0.2f, 1f), 1f, 1f)));
+                        else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Trusted user")
+                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.magenta);
+                        else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Known user")
+                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
+                        else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "User")
+                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.green);
+                        else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "New user")
+                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.Lerp(Color.blue, Color.white, 0.2f));
+                        else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Visitor")
+                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.gray);
+
+                        if (sRegion != null)
+                            sRegion.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Color.red);
+
+                        if (PlayerWrapper.isFriend(allPlayers[i].field_Internal_VRCPlayer_0.field_Private_Player_0))
+                            allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * 0.2f, 1f), 1f, 1f));
+                        else
+                            allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.white;
+                    }
+                }
+                else
+                {
+                    var allPlayers = Wrapper.GetPlayerManager().GetAllPlayers();
+                    for (int i = 0; i < allPlayers.Count; i++)
+                    {
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.red);
+                        allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.red;
+                        allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.red;
+                        allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.red;
+                        allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.clear;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                IceLogger.Log(ex.ToString());
+            }
+        }
+
 
         public override void OnUpdate()
         {
@@ -69,7 +113,7 @@ namespace IceBurn.Mod
             }
 
             // Телепорт в точку которая находится на центре экрана по кнопку T
-            if (Input.GetKeyDown(KeyCode.T))
+            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Mouse0))
                 GlobalUtils.RayTeleport();
 
             // Клонирование аватара на кнопку B [при выбранном игроке]
@@ -85,6 +129,7 @@ namespace IceBurn.Mod
                     {
                         IceLogger.Log("Avatar release status is PRIVATE!");
                     }
+                    IceLogger.Log(avatar.id);
                 }
                 catch (Exception)
                 {
@@ -112,14 +157,15 @@ namespace IceBurn.Mod
                 }
 
                 // Поиск и добавление обьектов в ESP И СУКА ПОЧЕМУ ТО ОНО НЕ РАБОТАЕТ!
-                /*foreach (VRC_Pickup pickup in Resources.FindObjectsOfTypeAll<VRC_Pickup>())
+                foreach (VRC_Pickup pickup in Resources.FindObjectsOfTypeAll<VRC_Pickup>())
                 {
                     if (pickup.gameObject.transform.Find("SelectRegion"))
                     {
-                        pickup.gameObject.transform.Find("SelectRegion").GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Color.red);
+                        pickup.gameObject.transform.Find("SelectRegion").GetComponent<Renderer>().sharedMaterial.SetColor("_HighlightColor", Color.red);
                         Wrapper.GetHighlightsFX().EnableOutline(pickup.gameObject.transform.Find("SelectRegion").GetComponent<Renderer>(), GlobalUtils.ESP);
+                        //HighlightsFX.prop_HighlightsFX_0.field_Protected_Material_0.SetColor("_HighlightColor", Color.red);
                     }
-                }*/
+                }
             }
 
             // Ебать уши другим игрокам на F9
@@ -165,9 +211,7 @@ namespace IceBurn.Mod
 
             if (Input.GetKeyDown(KeyCode.H))
             {
-                IceLogger.Log(Wrapper.GetSelectedPlayer(Wrapper.GetQuickMenu()).field_Private_USpeaker_0.SpeakerVolume.ToString());
-                /*Networking.GoToRoom(Wrapper.GetInstance().instanceWorld.id + ":" + Wrapper.GetInstance().instanceWorld.currentInstanceIdWithTags);
-                IceLogger.Log(Wrapper.GetInstance().instanceWorld.id + ":" + Wrapper.GetInstance().instanceWorld.currentInstanceIdWithTags);*/
+
             }
 
             if (GlobalUtils.walkSpeed <= 0)
@@ -176,10 +220,15 @@ namespace IceBurn.Mod
                 GlobalUtils.UpdatePlayerSpeed();
                 UI.resetWalkSpeed.setButtonText("Reset\nSpeed\n[" + GlobalUtils.walkSpeed + "]");
             }
-
-            if (GlobalUtils.ESP)
+            if (GlobalUtils.flySpeed <= 0)
             {
-                HighlightsFX.prop_HighlightsFX_0.field_Protected_Material_0.SetColor("_HighlightColor", Color.red);
+                GlobalUtils.flySpeed = 1;
+                UI.resetflySpeed.setButtonText("Reset\nSpeed\n[" + GlobalUtils.walkSpeed + "]");
+            }
+            if (GlobalUtils.brightness <= 0f)
+            {
+                GlobalUtils.brightness = 0.1f;
+                UI.resetBrightness.setButtonText("Reset\nBrightness\n[" + GlobalUtils.brightness + "]");
             }
 
             // Управление во время полёта
@@ -188,11 +237,11 @@ namespace IceBurn.Mod
                 GameObject playercamera = Wrapper.GetPlayerCamera();
                 VRCPlayer player = PlayerWrapper.GetCurrentPlayer();
 
-                if (GlobalUtils.flySpeed <= 0)
+                /*if (GlobalUtils.flySpeed <= 0)
                 {
                     GlobalUtils.flySpeed = 1;
                     UI.resetflySpeed.setButtonText("Reset\nSpeed\n[" + GlobalUtils.flySpeed + "]");
-                }
+                }*/
 
                 if (Input.mouseScrollDelta.y != 0)
                 {
@@ -220,9 +269,12 @@ namespace IceBurn.Mod
                     player.transform.position += playercamera.transform.right * GlobalUtils.flySpeed * Time.deltaTime * Input.GetAxis("Joy1 Axis 1");
             }
         }
-        public override void OnFixedUpdate()
-        {
 
+        public override void OnLateUpdate()
+        {
+            PlayerWrapper.UpdateFriendList();
+            RNPlates(GlobalUtils.FakeNamePlate);
+            HighlightsFX.prop_HighlightsFX_0.field_Protected_Material_0.SetColor("_HighlightColor", Color.red);
         }
     }
 }
