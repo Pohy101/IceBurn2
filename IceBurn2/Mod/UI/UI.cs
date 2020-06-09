@@ -12,6 +12,8 @@ using System.Diagnostics;
 using IceBurn.Mod.Other;
 using System.Windows.Forms;
 using UnityEngine.Experimental.UIElements.StyleEnums;
+using UnityEngine.UI;
+using System.Collections.Generic;
 
 namespace IceBurn.Mod
 {
@@ -27,7 +29,7 @@ namespace IceBurn.Mod
         public static QMNestedButton flyMenu;
         public static QMNestedButton FOVChangerMenu;
         public static QMNestedButton teleportMenu;
-        public static QMNestedButton followMenu;
+        public static QMNestedButton pointTeleportMenu;
         public static QMNestedButton speedHackMenu;
         public static QMNestedButton userUtilsMenu;
         public static QMNestedButton brightnessMenu;
@@ -67,6 +69,10 @@ namespace IceBurn.Mod
         public static QMHalfButton FOVUpX;
         public static QMHalfButton FOVDownX;
 
+        // Кнопки PointTeleportmenu
+        public static QMHalfButton createNewPointToTeleport;
+        public static QMHalfButton removeAllPointsToTeleport;
+
         // Кнопки brightnessMenu
         public static QMSingleButton resetBrightness;
         public static QMHalfButton brightnessUp;
@@ -87,6 +93,14 @@ namespace IceBurn.Mod
 
         // Другие кнопки
         public static QMSingleButton quitApp;
+
+        // XXX
+        private static List<QMHalfButton> tPlayerList = new List<QMHalfButton>();
+        private static List<Player> tmpPlayerList = new List<Player>();
+
+        // TeleportPoints
+        private static List<GameObject> pointTeleportList = new List<GameObject>();
+        private static List<QMHalfButton> tPointList = new List<QMHalfButton>();
 
         public override void OnStart()
         {
@@ -173,7 +187,7 @@ namespace IceBurn.Mod
             {
                 GlobalUtils.ESP = true;
 
-                var allPlayers = PlayerWrapper.GetAllPlayers(Wrapper.GetPlayerManager()).ToArray();
+                var allPlayers = PlayerWrapper.GetAllPlayers().ToArray();
                 for (int i = 0; i < allPlayers.Length; i++)
                 {
                     Transform sRegion = allPlayers[i].transform.Find("SelectRegion");
@@ -191,7 +205,7 @@ namespace IceBurn.Mod
             {
                 GlobalUtils.ESP = false;
 
-                var allPlayers = PlayerWrapper.GetAllPlayers(Wrapper.GetPlayerManager()).ToArray();
+                var allPlayers = PlayerWrapper.GetAllPlayers().ToArray();
                 for (int i = 0; i < allPlayers.Length; i++)
                 {
                     Transform sRegion = allPlayers[i].transform.Find("SelectRegion");
@@ -264,36 +278,208 @@ namespace IceBurn.Mod
 
             teleportMenu = new QMNestedButton(mainMenuP1, 2, 0, "Teleport", new Action(() =>
             {
-                var players = PlayerWrapper.GetAllPlayers(Wrapper.GetPlayerManager()).ToArray();
+                // Remove old Buttons
+                foreach (QMHalfButton item in tPlayerList)
+                    item.DestroyMe();
+                tPlayerList.Clear();
 
-                int localX = 1;
+                // Get All Players
+                var players = PlayerWrapper.GetAllPlayers();
+
+                // REAdd Players to List
+                tmpPlayerList.Clear();
+                for (int i = 0; i < players.Count; i++)
+                    tmpPlayerList.Add(players[i]);
+
+                // Button Local Position
+                int localX = 0;
                 float localY = -0.5f;
 
-                for (int i = 0; i < players.Length; i++)
+                if (tmpPlayerList.Count <= 24)
                 {
-                    IceLogger.Log("PlayerList:");
-                    IceLogger.Log(players[i].ToString());
-                    new QMHalfButton(teleportMenu, localX, localY, players[i].ToString(), new Action(() =>
+                    localX = 1;
+                    foreach (Player player in tmpPlayerList)
                     {
-                        PlayerWrapper.GetCurrentPlayer().transform.position = players[i].transform.position;
-                        IceLogger.Log("SelectedPlayer: " + players[i].ToString());
-                    }), "Teleport To " + players[i].ToString());
+                        QMHalfButton tmpButton = new QMHalfButton(teleportMenu, localX, localY, player.ToString(), new Action(() =>
+                        {
+                            try
+                            {
+                                IceLogger.Log("Trying Teleport TO: [" + player.ToString() + "]");
+                                PlayerWrapper.GetCurrentPlayer().transform.position = player.transform.position;
+                            }
+                            catch (Exception ex)
+                            {
+                                IceLogger.Error(ex.ToString());
+                            }
+                        }), "Teleport To " + player.ToString());
 
-                    localX++;
+                        if (PlayerWrapper.isFriend(player.field_Internal_VRCPlayer_0.prop_Player_0))
+                            tmpButton.setTextColor(Color.green);
+                        else
+                            tmpButton.setTextColor(Color.white);
 
-                    if (localX > 4
-                    )
+                        if (PlayerWrapper.GetTrustLevel(player) == "Veteran user")
+                            tmpButton.setBackgroundColor(Color.cyan);
+                        else if (PlayerWrapper.GetTrustLevel(player) == "Trusted user")
+                            tmpButton.setBackgroundColor(Color.magenta);
+                        else if (PlayerWrapper.GetTrustLevel(player) == "Known user")
+                            tmpButton.setBackgroundColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
+                        else if (PlayerWrapper.GetTrustLevel(player) == "User")
+                            tmpButton.setBackgroundColor(Color.green);
+                        else if (PlayerWrapper.GetTrustLevel(player) == "New user")
+                            tmpButton.setBackgroundColor(Color.blue);
+                        else if (PlayerWrapper.GetTrustLevel(player) == "Visitor")
+                            tmpButton.setBackgroundColor(Color.gray);
+
+                        if (player.field_Private_APIUser_0.id == "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223" || player.field_Internal_VRCPlayer_0.prop_String_1 == PlayerWrapper.GetCurrentPlayer().prop_String_1)
+                        {
+                            tmpButton.setBackgroundColor(Color.black);
+                            tmpButton.setTextColor(Color.red);
+                        }
+
+                        localX++;
+                        if (localX > 4)
+                        {
+                            localX = 1;
+                            localY += 1f;
+                        }
+                        tPlayerList.Add(tmpButton);
+                    }
+                }
+                else
+                {
+                    foreach (Player player in tmpPlayerList)
                     {
-                        localX = 1;
-                        localY += 1f;
+                        QMHalfButton tmpButton = new QMHalfButton(teleportMenu, localX, localY, player.ToString(), new Action(() =>
+                        {
+                            try
+                            {
+                                IceLogger.Log("Trying Teleport TO: [" + player.ToString() + "]");
+                                PlayerWrapper.GetCurrentPlayer().transform.position = player.transform.position;
+                            }
+                            catch (Exception ex)
+                            {
+                                IceLogger.Error(ex.ToString());
+                            }
+                        }), "Teleport To " + player.ToString());
+
+                        if (PlayerWrapper.isFriend(player.field_Internal_VRCPlayer_0.prop_Player_0))
+                            tmpButton.setTextColor(Color.green);
+                        else
+                            tmpButton.setTextColor(Color.white);
+
+                        if (PlayerWrapper.GetTrustLevel(player) == "Veteran user")
+                            tmpButton.setBackgroundColor(Color.cyan);
+                        else if (PlayerWrapper.GetTrustLevel(player) == "Trusted user")
+                            tmpButton.setBackgroundColor(Color.magenta);
+                        else if (PlayerWrapper.GetTrustLevel(player) == "Known user")
+                            tmpButton.setBackgroundColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
+                        else if (PlayerWrapper.GetTrustLevel(player) == "User")
+                            tmpButton.setBackgroundColor(Color.green);
+                        else if (PlayerWrapper.GetTrustLevel(player) == "New user")
+                            tmpButton.setBackgroundColor(Color.blue);
+                        else if (PlayerWrapper.GetTrustLevel(player) == "Visitor")
+                            tmpButton.setBackgroundColor(Color.gray);
+
+                        if (player.field_Private_APIUser_0.id == "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223" || player.field_Internal_VRCPlayer_0.prop_String_1 == PlayerWrapper.GetCurrentPlayer().prop_String_1)
+                        {
+                            tmpButton.setBackgroundColor(Color.black);
+                            tmpButton.setTextColor(Color.red);
+                        }
+
+                        localX++;
+                        if (localX > 5 && localY < 4f)
+                        {
+                            localX = 0;
+                            localY += 1f;
+                        }
+                        else if (localX > 5 && localY > 2f)
+                        {
+                            localX = 1;
+                            localY += 1f;
+                        }
+                        tPlayerList.Add(tmpButton);
                     }
                 }
             }), "Teleport To Player");
 
-            followMenu = new QMNestedButton(mainMenuP1, 2, 1, "Follow\nPlayer", new Action(() =>
+            void updatepointlist()
             {
-                new QMSingleButton(followMenu, 1, 0, "This is Follow menu", new Action(() => { IceLogger.Log("Test BUTTON Clicked"); }), "TEST INFO BUTTON");
-            }), "Select Target And Follow IT! :D");
+                // Remove old Buttons
+                foreach (QMHalfButton item in tPointList)
+                    item.DestroyMe();
+                tPointList.Clear();
+
+                removeAllPointsToTeleport.setTextColor(Color.red);
+                if (pointTeleportList.Count < 24)
+                    createNewPointToTeleport.setActive(true);
+                else
+                    createNewPointToTeleport.setActive(false);
+
+                int localX = 1;
+                float localY = -0.5f;
+
+                foreach (GameObject point in pointTeleportList)
+                {
+                    QMHalfButton tmpButton = new QMHalfButton(pointTeleportMenu, localX, localY, point.name, new Action(() =>
+                    {
+                        try
+                        {
+                            IceLogger.Log("Trying Teleport TO: [" + point.name + "]");
+                            PlayerWrapper.GetCurrentPlayer().transform.position = point.transform.position;
+                        }
+                        catch (Exception ex)
+                        {
+                            IceLogger.Error(ex.ToString());
+                        }
+                    }), "Teleport To " + point.name);
+
+                    localX++;
+                    if (localX > 4)
+                    {
+                        localX = 1;
+                        localY += 1f;
+                    }
+                    tPointList.Add(tmpButton);
+                }
+
+                if (pointTeleportList.Count < 24)
+                    createNewPointToTeleport.setActive(true);
+                else
+                    createNewPointToTeleport.setActive(false);
+            }
+
+            pointTeleportMenu = new QMNestedButton(mainMenuP1, 2, 1, "Point\nTeleport", new Action(() =>
+            {
+                updatepointlist();
+            }), "Teleport TO Points");
+
+            removeAllPointsToTeleport = new QMHalfButton(pointTeleportMenu, 5, 2.5f, "Remove All", new Action(() =>
+            {
+                foreach (QMHalfButton buttons in tPointList)
+                    buttons.DestroyMe();
+                tPointList.Clear();
+                pointTeleportList.Clear();
+
+                if (pointTeleportList.Count < 24)
+                    createNewPointToTeleport.setActive(true);
+                else
+                    createNewPointToTeleport.setActive(false);
+            }), "Remove All Points");
+
+            createNewPointToTeleport = new QMHalfButton(pointTeleportMenu, 5, 1.5f, "Create New", new Action(() =>
+            {
+                Transform tmpPlayerTransform = PlayerWrapper.GetCurrentPlayer().gameObject.transform;
+                GameObject tmpPointGO = Instantiate(new GameObject(), tmpPlayerTransform);
+                Text tmpPointGOText = tmpPointGO.AddComponent<Text>();
+
+                //tmpPointGOText.font = Resources.GetBuiltinResource(Il2CppSystem.Type.typeof(Font), "BankGothicLight.ttf") as Font;
+                tmpPointGOText.text = PlayerWrapper.GetCurrentPlayer().transform.position.ToString();
+                tmpPointGO.name = tmpPointGOText.text;
+
+                pointTeleportList.Add(tmpPointGO);
+                updatepointlist();
+            }), "Create New Point");
 
             FOVUp = new QMHalfButton(FOVChangerMenu, 2, -0.5f, "▲", new Action(() =>
             {
@@ -398,7 +584,7 @@ namespace IceBurn.Mod
                  });
             }), "Delete All Portals");
 
-            hideAllPortals = new QMSingleButton(mainMenuP1, 3, 1, "Hide\nPortals", new Action(() =>
+            hideAllPortals = new QMSingleButton(mainMenuP1, 3, 1, "Hide Portals", new Action(() =>
             {
                 (from portal in Resources.FindObjectsOfTypeAll<PortalInternal>()
                  where portal.gameObject.activeInHierarchy && !portal.gameObject.GetComponentInParent<VRC_PortalMarker>()
@@ -432,21 +618,27 @@ namespace IceBurn.Mod
 
             test = new QMSingleButton(mainMenuP1, 4, 2, "Test", new Action(() =>
             {
+            var allPlayers = PlayerWrapper.GetAllPlayers().ToArray();
+            for (int i = 0; i < allPlayers.Length; i++)
+            {
+                IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_0);
+                IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_1);
+                var usertags = allPlayers[i].GetAPIUser().tags;
+                foreach (var tags in usertags)
+                {
+                    IceLogger.Log(allPlayers[i].ToString() + " " + tags);
+                }
+                //Status: IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.field_Internal_String_1.ToString());
+            }
+
+            IceLogger.Log(PlayerWrapper.GetCurrentPlayer().namePlate.mainText.font.name);
+
                 /*var allPlayers = Wrapper.GetPlayerManager().GetAllPlayers().ToArray();
                 for (int i = 0; i < allPlayers.Length; i++)
                 {
-                    IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_0);
-                    IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_1);
-                    var usertags = allPlayers[i].GetAPIUser().tags;
-                    foreach (var tags in usertags)
-                    {
-                        IceLogger.Log(allPlayers[i].ToString() + " " + tags);
-                    }
-                    //Status: IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.field_Internal_String_1.ToString());
-                }*/
-                var allPlayers = Wrapper.GetPlayerManager().GetAllPlayers().ToArray();
-                for (int i = 0; i < allPlayers.Length; i++)
-                {
+                    Image someImage = allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.gameObject.AddComponent<Image>();
+                    someImage.rectTransform.anchoredPosition += new Vector2(-1f, 0f);
+
                     float distance = Vector3.Distance(PlayerWrapper.GetCurrentPlayer().transform.position, allPlayers[i].transform.position);
                     IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_0 + ": " + distance);
 
@@ -456,7 +648,7 @@ namespace IceBurn.Mod
                     {
                         IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_0 + ": " + tags);
                     }
-                }
+                }*/
             }), "Test");
 
             toggleShadows = new QMToggleButton(mainMenuP2, 3, 0, "Shadows ON", new Action(() =>
@@ -556,13 +748,13 @@ namespace IceBurn.Mod
 
             hideAllVisitors = new QMSingleButton(mainMenuP2, 2, 1, "Remove\nVisitors", new Action(() =>
             {
-                var allPlayers = Wrapper.GetPlayerManager().GetAllPlayers().ToArray();
+                var allPlayers = PlayerWrapper.GetAllPlayers().ToArray();
                 for (int i = 0; i < allPlayers.Length; i++)
                 {
                     if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Visitor")
                     {
                         PlayerWrapper.RemoveAvatar(allPlayers[i].field_Internal_VRCPlayer_0.field_Private_Player_0);
-                        UnityEngine.GameObject.Destroy(allPlayers[i].field_Internal_VRCPlayer_0.namePlate.gameObject);
+                        Destroy(allPlayers[i].field_Internal_VRCPlayer_0.namePlate.gameObject);
                     }
                 }
             }), "Show Visitors");
@@ -578,18 +770,18 @@ namespace IceBurn.Mod
 
             selfCrashCheck = new QMSingleButton(mainMenuP2, 4, 1, "Self\nCrash\nCheck", new Action(() =>
             {
-                anticrash.particle_check(PlayerWrapper.GetCurrentPlayer().prop_Player_0);
-                anticrash.polygon_check(PlayerWrapper.GetCurrentPlayer().prop_Player_0, Wrapper.get_poly(PlayerWrapper.GetCurrentPlayer().prop_Player_0));
-                anticrash.shader_check(PlayerWrapper.GetCurrentPlayer().prop_Player_0);
-                anticrash.mesh_check(PlayerWrapper.GetCurrentPlayer().prop_Player_0);
-                anticrash.mats_check(PlayerWrapper.GetCurrentPlayer().prop_Player_0);
-                anticrash.work_hk(PlayerWrapper.GetCurrentPlayer().prop_Player_0, Wrapper.get_poly(PlayerWrapper.GetCurrentPlayer().prop_Player_0));
-                IceLogger.Log("Player " + PlayerWrapper.GetCurrentPlayer().prop_Player_0.field_Private_String_0 + " Checked");
+                anticrash.particle_check(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0);
+                anticrash.polygon_check(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0, Wrapper.get_poly(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0));
+                anticrash.shader_check(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0);
+                anticrash.mesh_check(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0);
+                anticrash.mats_check(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0);
+                anticrash.work_hk(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0, Wrapper.get_poly(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0));
+                IceLogger.Log("Player " + PlayerWrapper.GetCurrentPlayer().field_Private_Player_0.field_Private_String_0 + " Checked");
             }), "Self Crash Check");
 
             invalid = new QMToggleButton(mainMenuP2, 1, 2, "Invalid?", new Action(() =>
             {
-                UnityEngine.Application.targetFrameRate = 10;
+                UnityEngine.Application.targetFrameRate = 1;
             }), "Maybe", new Action(() =>
             {
                 UnityEngine.Application.targetFrameRate = 144;

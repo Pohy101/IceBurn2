@@ -11,7 +11,7 @@ using VRC.Core;
 
 namespace IceBurn.Mod.AvFav
 {
-    class UI : VRmod
+    class FavButtons : VRmod
     {
         public override string Name => "Avatar UI";
         public override string Description => "creates buttons in QM User Interface";

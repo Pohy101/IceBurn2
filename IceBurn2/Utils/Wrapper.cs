@@ -23,9 +23,9 @@ namespace IceBurn.Utils
             return VRCPlayer.field_Internal_Static_VRCPlayer_0;
         }
 
-        public static Il2CppSystem.Collections.Generic.List<Player> GetAllPlayers(this PlayerManager instance)
+        public static Il2CppSystem.Collections.Generic.List<Player> GetAllPlayers()
         {
-            return instance.field_Private_List_1_Player_0;
+            return Wrapper.GetPlayerManager().field_Private_List_1_Player_0;
         }
 
         public static APIUser GetAPIUser(this Player player)
@@ -33,9 +33,14 @@ namespace IceBurn.Utils
             return player.field_Private_APIUser_0;
         }
 
-        public static Player GetPlayer(this PlayerManager instance, string UserID)
+        public static string GetWorldID(Player p)
         {
-            Il2CppSystem.Collections.Generic.List<Player> Players = instance.GetAllPlayers();
+            return p.field_Private_APIUser_0.worldId;
+        }
+
+        public static Player GetPlayer(string UserID)
+        {
+            Il2CppSystem.Collections.Generic.List<Player> Players = GetAllPlayers();
             Player Foundplayer = null;
             for(int i = 0; i < Players.Count; i++)
             {
@@ -185,8 +190,7 @@ namespace IceBurn.Utils
         public static Player GetSelectedPlayer(this QuickMenu instance)
         {
             APIUser APIUser = instance.field_Private_APIUser_0;
-            PlayerManager playerManager = Wrapper.GetPlayerManager();
-            return playerManager.GetPlayer(APIUser.id);
+            return PlayerWrapper.GetPlayer(APIUser.id);
         }
 
         public static int get_meshes(Player p)

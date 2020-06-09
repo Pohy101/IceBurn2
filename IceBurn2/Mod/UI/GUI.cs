@@ -1,4 +1,5 @@
 ﻿using IceBurn.Other;
+using IceBurn.Utils;
 using System.Collections;
 using UnityEngine;
 
@@ -20,7 +21,6 @@ namespace IceBurn.Mod
             {
                 IceLogger.Log("You clicked the button!");
             }*/
-           
         }
 
         public override void OnUpdate()

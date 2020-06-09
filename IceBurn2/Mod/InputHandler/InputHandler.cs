@@ -6,6 +6,8 @@ using VRC.SDKBase;
 using VRC;
 using VRC.Core;
 using VRC.UI;
+using UnityEngine.UI;
+using Il2CppSystem;
 
 namespace IceBurn.Mod.InputHandler
 {
@@ -25,24 +27,22 @@ namespace IceBurn.Mod.InputHandler
             {
                 if (!state)
                 {
-                    var allPlayers = Wrapper.GetPlayerManager().GetAllPlayers().ToArray();
+                    var allPlayers = PlayerWrapper.GetAllPlayers().ToArray();
                     for (int i = 0; i < allPlayers.Length; i++)
                     {
                         Transform sRegion = allPlayers[i].transform.Find("SelectRegion");
-                        allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.white;
-                        allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.white;
-                        allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.black;
+                        allPlayers[i].field_Internal_VRCPlayer_0.namePlateTalkSprite = allPlayers[i].field_Internal_VRCPlayer_0.namePlateSilentSprite;
 
                         if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Veteran user")
-                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * 0.2f, 1f), 1f, 1f)));
+                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * 0.5f, 1f), 1f, 1f)));
                         else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Trusted user")
                             allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.magenta);
                         else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Known user")
                             allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
                         else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "User")
                             allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.green);
-                        else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "New user")
-                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.Lerp(Color.blue, Color.white, 0.2f));
+                        /*else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "New user")
+                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(new Color(0f, 60f, 150f));*/
                         else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Visitor")
                             allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.gray);
 
@@ -50,14 +50,33 @@ namespace IceBurn.Mod.InputHandler
                             sRegion.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Color.red);
 
                         if (PlayerWrapper.isFriend(allPlayers[i].field_Internal_VRCPlayer_0.field_Private_Player_0))
-                            allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * 0.2f, 1f), 1f, 1f));
+                        {
+                            allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * 0.2f, 1f), 1f, 1f));
+                            allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * 0.2f, 1f), 1f, 1f));
+                            allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * 0.2f, 1f), 1f, 1f));
+                            //allPlayers[i].field_Internal_VRCPlayer_0.statusPlate.mainText.text = PlayerWrapper.GetTrustLevel(allPlayers[i]) + " Your Friend!)";
+                        }
                         else
-                            allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.white;
+                        {
+                            allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.black;
+                            allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.white;
+                            allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.white;
+                            //allPlayers[i].field_Internal_VRCPlayer_0.statusPlate.mainText.text = PlayerWrapper.GetTrustLevel(allPlayers[i]);
+                        }
+
+                        if (allPlayers[i].field_Internal_VRCPlayer_0.prop_String_1 == "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223")
+                        {
+                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.black);
+                            allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.red;
+                            allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.clear;
+                            allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.red;
+                            allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.red;
+                        }
                     }
                 }
                 else
                 {
-                    var allPlayers = Wrapper.GetPlayerManager().GetAllPlayers();
+                    var allPlayers = PlayerWrapper.GetAllPlayers();
                     for (int i = 0; i < allPlayers.Count; i++)
                     {
                         allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.red);
@@ -65,10 +84,11 @@ namespace IceBurn.Mod.InputHandler
                         allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.red;
                         allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.red;
                         allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.clear;
+                        allPlayers[i].field_Internal_VRCPlayer_0.namePlateTalkSprite = allPlayers[i].field_Internal_VRCPlayer_0.namePlateSilentSprite;
                     }
                 }
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 IceLogger.Log(ex.ToString());
             }
@@ -131,7 +151,7 @@ namespace IceBurn.Mod.InputHandler
                     }
                     IceLogger.Log(avatar.id);
                 }
-                catch (Exception)
+                catch (System.Exception)
                 {
                     IceLogger.Error("User not selected!");
                     throw;
@@ -263,16 +283,17 @@ namespace IceBurn.Mod.InputHandler
                 if (Input.GetKey(KeyCode.Q))
                     player.transform.position -= playercamera.transform.up * GlobalUtils.flySpeed * Time.deltaTime;
 
-                if (Math.Abs(Input.GetAxis("Joy1 Axis 2")) > 0f)
+                if (System.Math.Abs(Input.GetAxis("Joy1 Axis 2")) > 0f)
                     player.transform.position += playercamera.transform.forward * GlobalUtils.flySpeed * Time.deltaTime * (Input.GetAxis("Joy1 Axis 2") * -1f);
-                if (Math.Abs(Input.GetAxis("Joy1 Axis 1")) > 0f)
+                if (System.Math.Abs(Input.GetAxis("Joy1 Axis 1")) > 0f)
                     player.transform.position += playercamera.transform.right * GlobalUtils.flySpeed * Time.deltaTime * Input.GetAxis("Joy1 Axis 1");
             }
         }
 
         public override void OnLateUpdate()
         {
-            PlayerWrapper.UpdateFriendList();
+            if (Input.anyKey)
+                PlayerWrapper.UpdateFriendList();
             RNPlates(GlobalUtils.FakeNamePlate);
             HighlightsFX.prop_HighlightsFX_0.field_Protected_Material_0.SetColor("_HighlightColor", Color.red);
         }
