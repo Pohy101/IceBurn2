@@ -1,12 +1,9 @@
 ﻿using IceBurn.API;
+using IceBurn.Mods.Fav.Config;
 using IceBurn.Other;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 using VRC.Core;
 
 namespace IceBurn.Mod.AvFav
@@ -19,11 +16,31 @@ namespace IceBurn.Mod.AvFav
         public static FavSingleButton ShowAuthor;
         public static FavSingleButton FavDownloadVRCA;
 
+        public static AvatarListApi CustomList = new AvatarListApi();
+
         public override void OnStart()
         {
-            AddRemoveFavorite = new FavSingleButton("AddRemoveFavorite", 0f, -80f, "Add / Remove", new Action(() =>
+            AddRemoveFavorite = new FavSingleButton("AddRemoveFavorite", 0f, -80f, Config.CFG.AddFavoriteTXT, new Action(() =>
             {
-                IceLogger.Log("It IS WORKING!");
+                var avatar = CustomList.AList.avatarPedestal.field_Internal_ApiAvatar_0;
+                if (avatar.releaseStatus != "private")
+                {
+                    if (!Config.DAvatars.Any(v => v.AvatarID == avatar.id))
+                    {
+                        AvatarListHelper.AvatarListPassthru(avatar);
+                        CustomList.AList.Refresh(Config.DAvatars.Select(x => x.AvatarID).Reverse());
+                        AddRemoveFavorite.setButtonText(Config.CFG.AddFavoriteTXT);
+                        CustomList.ListTitle.text = Config.CFG.CustomName + " / " + Config.DAvatars.Count;
+                    }
+                    else
+                    {
+
+                        AvatarListHelper.AvatarListPassthru(avatar);
+                        CustomList.AList.Refresh(Config.DAvatars.Select(x => x.AvatarID).Reverse());
+                        AddRemoveFavorite.setButtonText(Config.CFG.AddFavoriteTXT);
+                        CustomList.ListTitle.text = Config.CFG.CustomName + " / " + Config.DAvatars.Count;
+                    }
+                }
             }));
 
             ShowAuthor = new FavSingleButton("ShowAuthor", 0f, -684f, "Show Author", new Action(() =>

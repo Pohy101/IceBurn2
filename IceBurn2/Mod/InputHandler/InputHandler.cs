@@ -32,6 +32,7 @@ namespace IceBurn.Mod.InputHandler
                     {
                         Transform sRegion = allPlayers[i].transform.Find("SelectRegion");
                         allPlayers[i].field_Internal_VRCPlayer_0.namePlateTalkSprite = allPlayers[i].field_Internal_VRCPlayer_0.namePlateSilentSprite;
+                        allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.green;
 
                         if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Veteran user")
                             allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * 0.5f, 1f), 1f, 1f)));
@@ -41,28 +42,11 @@ namespace IceBurn.Mod.InputHandler
                             allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
                         else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "User")
                             allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.green);
-                        /*else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "New user")
-                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(new Color(0f, 60f, 150f));*/
                         else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Visitor")
                             allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.gray);
 
                         if (sRegion != null)
                             sRegion.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Color.red);
-
-                        if (PlayerWrapper.isFriend(allPlayers[i].field_Internal_VRCPlayer_0.field_Private_Player_0))
-                        {
-                            allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * 0.2f, 1f), 1f, 1f));
-                            allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * 0.2f, 1f), 1f, 1f));
-                            allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * 0.2f, 1f), 1f, 1f));
-                            //allPlayers[i].field_Internal_VRCPlayer_0.statusPlate.mainText.text = PlayerWrapper.GetTrustLevel(allPlayers[i]) + " Your Friend!)";
-                        }
-                        else
-                        {
-                            allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.black;
-                            allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.white;
-                            allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.white;
-                            //allPlayers[i].field_Internal_VRCPlayer_0.statusPlate.mainText.text = PlayerWrapper.GetTrustLevel(allPlayers[i]);
-                        }
 
                         if (allPlayers[i].field_Internal_VRCPlayer_0.prop_String_1 == "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223")
                         {

@@ -39,7 +39,9 @@
     <Compile Include="Forms\TestForm.Designer.cs">
       <DependentUpon>TestForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Mod\AvFav\Config.cs" />
     <Compile Include="Mod\AvFav\FavButtons.cs" />
+    <Compile Include="Mod\AvFav\SavedAvi.cs" />
     <Compile Include="Mod\Other\AntiCrash.cs" />
     <Compile Include="Mod\Other\dynbones.cs" />
     <Compile Include="Mod\UI\UI.cs" />

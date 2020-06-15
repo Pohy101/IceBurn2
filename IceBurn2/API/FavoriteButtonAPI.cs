@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.Events;
+using IceBurn.Mods.Fav.Config;
+using VRC.Core;
 
 namespace IceBurn.API
 {
@@ -112,6 +114,7 @@ namespace IceBurn.API
                 OrigText = (Color)buttonTextColor;
         }
     }
+
     public class AvatarListApi
     {
         private static UiAvatarList aviList = null;
@@ -131,8 +134,8 @@ namespace IceBurn.API
                     var vlist = pageAvatar.transform.Find("Vertical Scroll View/Viewport/Content");
                     var updatethis = vlist.transform.Find("Favorite Avatar List").gameObject;
                     updatethis = GameObject.Instantiate(updatethis, updatethis.transform.parent);
-                    var avText = updatethis.transform.Find("Button");                                   // I make a invis list because 1 doesn't activate or have anything 
-                    avText.GetComponentInChildren<Text>().text = "New List";                            // running and its just easier to copy / less todo on copy.
+                    var avText = updatethis.transform.Find("Button");
+                    avText.GetComponentInChildren<Text>().text = "New List";
                     var UpdateValue = updatethis.GetComponent<UiAvatarList>();
                     //UpdateValue.category = UiAvatarList.Nested0.SpecificList;
                     UpdateValue.category = UiAvatarList.EnumNPublicSealedvaInPuMiFaSpClPuLi9vUnique.SpecificList;
@@ -163,6 +166,80 @@ namespace IceBurn.API
         {
             ListBtn.onClick = new Button.ButtonClickedEvent();
             ListBtn.onClick.AddListener(v);
+        }
+    }
+
+    public static class AvatarListHelper
+    {
+        public static void Refresh(this UiAvatarList value, IEnumerable<string> list)
+        {
+
+            value.field_Private_Dictionary_2_String_ApiAvatar_0.Clear();
+            foreach (var t in list)
+            {
+                if (!value.field_Private_Dictionary_2_String_ApiAvatar_0.ContainsKey(t))
+                    value.field_Private_Dictionary_2_String_ApiAvatar_0.Add(t, null);
+            }
+            value.specificListIds = list.ToArray();
+            //value.Method_Protected_Void_Int32_0(0);
+        }
+
+        public static void FirstLoad(this UiAvatarList value, List<SavedAvi> list)
+        {
+            int deleted = 0;
+            value.field_Private_Dictionary_2_String_ApiAvatar_0.Clear();
+            for (int i = 0; i < list.Count(); i++)
+            {
+                var t = list[i];
+                var avatar = new ApiAvatar() { id = t.AvatarID, name = t.Name, thumbnailImageUrl = t.ThumbnailImageUrl };
+                avatar.Get(new Action<ApiContainer>(x =>
+                {
+                    var avi = x.Model as ApiAvatar;
+                    if (avatar.releaseStatus == "private")
+                    {
+                        deleted++;
+                        list.Remove(t);
+                        return;
+                    }
+                    else
+                    {
+                        if (!value.field_Private_Dictionary_2_String_ApiAvatar_0.ContainsKey(t.AvatarID))
+                            value.field_Private_Dictionary_2_String_ApiAvatar_0.Add(t.AvatarID, avatar);
+                    }
+                }));
+            }
+            if (deleted > 0)
+            {
+                MelonLoader.MelonModLogger.Log($"Deleted {deleted} private avatars.");
+                Config.DAvatars = list;
+                Config.UpdateAvatars();
+            }
+            value.specificListIds = list.Select(x => x.AvatarID).ToArray();
+            //value.Method_Protected_Void_Int32_0(0);
+        }
+
+        public static bool AvatarListPassthru(ApiAvatar avi)
+        {
+            if (avi.releaseStatus == "private" || avi == null)
+            {
+                return false;
+            }
+            if (!Config.DAvatars.Any(v => v.AvatarID == avi.id))
+            {
+                Config.DAvatars.Add(new SavedAvi()
+                {
+                    AvatarID = avi.id,
+                    Name = avi.name,
+                    ThumbnailImageUrl = avi.thumbnailImageUrl,
+                });
+            }
+            else
+            {
+                Config.DAvatars.RemoveAll(v => v.AvatarID == avi.id);
+            }
+
+            Config.UpdateAvatars();
+            return true;
         }
     }
 }

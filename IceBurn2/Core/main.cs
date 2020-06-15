@@ -18,7 +18,7 @@ namespace IceBurn
         public override void OnApplicationStart()
         {
             Addons.Add(new InputHandler());
-            Addons.Add(new Mod.GUI());
+            //Addons.Add(new Mod.GUI());
             Addons.Add(new Mod.UI());
             Addons.Add(new Discord());
             Addons.Add(new FOVChanger());
