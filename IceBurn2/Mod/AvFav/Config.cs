@@ -21,12 +21,11 @@ namespace IceBurn.Mods.Fav.Config
 
         public static List<SavedAvi> DAvatars = new List<SavedAvi>
         {
-
             new SavedAvi()
             {
-                Name = "Example",
-                AvatarID = "avtr_ff9f140f-99e8-419f-817e-b88028b0bff0", //Ider what avatar this is LOL 
-                ThumbnailImageUrl = "https://d348imysud55la.cloudfront.net/thumbnails/3665376166.thumbnail-500.png",
+                Name = "",
+                AvatarID = "",
+                ThumbnailImageUrl = ""
             }
         };
 
@@ -49,7 +48,6 @@ namespace IceBurn.Mods.Fav.Config
             {
                 CFG = new Config();
                 SaveConfig();
-
             }
             else
             {

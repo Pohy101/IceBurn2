@@ -278,6 +278,8 @@ namespace IceBurn.Mod
 
             teleportMenu = new QMNestedButton(mainMenuP1, 2, 0, "Teleport", new Action(() =>
             {
+                PlayerWrapper.UpdateFriendList();
+
                 // Remove old Buttons
                 foreach (QMHalfButton item in tPlayerList)
                     item.DestroyMe();
@@ -597,10 +599,55 @@ namespace IceBurn.Mod
 
             toggleFakeNamePlate = new QMToggleButton(mainMenuP1, 4, 1, "Fake Nameplate", new Action(() =>
             {
-                GlobalUtils.FakeNamePlate = true;
+                var allPlayers = PlayerWrapper.GetAllPlayers();
+                for (int i = 0; i < allPlayers.Count; i++)
+                {
+                    allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.red);
+                    allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.red;
+                    allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.red;
+                    allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.red;
+                    allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.clear;
+                    allPlayers[i].field_Internal_VRCPlayer_0.namePlateTalkSprite = allPlayers[i].field_Internal_VRCPlayer_0.namePlateSilentSprite;
+                }
             }), "Real Nameplate", new Action(() =>
             {
-                GlobalUtils.FakeNamePlate = false;
+                PlayerWrapper.UpdateFriendList();
+
+                var allPlayers = PlayerWrapper.GetAllPlayers().ToArray();
+                for (int i = 0; i < allPlayers.Length; i++)
+                {
+                    Transform sRegion = allPlayers[i].transform.Find("SelectRegion");
+                    allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.green;
+                    allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.white;
+                    allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.white;
+                    allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.black;
+                    allPlayers[i].field_Internal_VRCPlayer_0.namePlateTalkSprite = allPlayers[i].field_Internal_VRCPlayer_0.namePlateSilentSprite;
+
+                    if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Veteran user")
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.cyan);
+                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Trusted user")
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.magenta);
+                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Known user")
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
+                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "User")
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.green);
+                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Visitor")
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.gray);
+
+                    if (sRegion != null)
+                        sRegion.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Color.red);
+
+                    HighlightsFX.prop_HighlightsFX_0.field_Protected_Material_0.SetColor("_HighlightColor", Color.red);
+
+                    if (allPlayers[i].field_Internal_VRCPlayer_0.prop_String_1 == "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223")
+                    {
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.black);
+                        allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.red;
+                        allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.clear;
+                        allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.red;
+                        allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.red;
+                    }
+                }
             }), "Toggle Fake NameSpace");
 
             toggleAudioBitrate = new QMToggleButton(mainMenuP1, 2, 2, "64kbps", new Action(() =>
@@ -618,20 +665,20 @@ namespace IceBurn.Mod
 
             test = new QMSingleButton(mainMenuP1, 4, 2, "Test", new Action(() =>
             {
-            var allPlayers = PlayerWrapper.GetAllPlayers().ToArray();
-            for (int i = 0; i < allPlayers.Length; i++)
-            {
-                IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_0);
-                IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_1);
-                var usertags = allPlayers[i].GetAPIUser().tags;
-                foreach (var tags in usertags)
+                var allPlayers = PlayerWrapper.GetAllPlayers().ToArray();
+                for (int i = 0; i < allPlayers.Length; i++)
                 {
-                    IceLogger.Log(allPlayers[i].ToString() + " " + tags);
+                    IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_0);
+                    IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.prop_String_1);
+                    var usertags = allPlayers[i].GetAPIUser().tags;
+                    foreach (var tags in usertags)
+                    {
+                        IceLogger.Log(allPlayers[i].ToString() + " " + tags);
+                    }
+                    //Status: IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.field_Internal_String_1.ToString());
                 }
-                //Status: IceLogger.Log(allPlayers[i].field_Internal_VRCPlayer_0.field_Internal_String_1.ToString());
-            }
 
-            IceLogger.Log(PlayerWrapper.GetCurrentPlayer().namePlate.mainText.font.name);
+                IceLogger.Log(PlayerWrapper.GetCurrentPlayer().namePlate.mainText.font.name);
 
                 /*var allPlayers = Wrapper.GetPlayerManager().GetAllPlayers().ToArray();
                 for (int i = 0; i < allPlayers.Length; i++)
@@ -785,7 +832,7 @@ namespace IceBurn.Mod
             }), "Maybe", new Action(() =>
             {
                 UnityEngine.Application.targetFrameRate = 144;
-            }), "Are you invalid blyat?");
+            }), "Are you invalid bleat?");
 
             // Initial State
             toggleFly.setToggleState(false);
@@ -797,7 +844,11 @@ namespace IceBurn.Mod
             ohShiitFly.setActive(false);
 
             if (VRCTrackingManager.Method_Public_Static_Boolean_11())
-                FOVChangerMenu.getMainButton().setActive(false);
+            {
+                FOVChangerMenu.getMainButton().setBackgroundColor(Color.gray);
+                FOVChangerMenu.getMainButton().setTextColor(Color.red);
+                FOVChangerMenu.getMainButton().setAction(null);
+            }
             else
                 FOVChangerMenu.getMainButton().setActive(true);
         }

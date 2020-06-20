@@ -17,12 +17,14 @@ namespace IceBurn
 
         public override void OnApplicationStart()
         {
+            Console.Title = "Ice Burn 2.0";
+
             Addons.Add(new InputHandler());
             //Addons.Add(new Mod.GUI());
             Addons.Add(new Mod.UI());
             Addons.Add(new Discord());
             Addons.Add(new FOVChanger());
-            Addons.Add(new Mod.AvFav.FavButtons());
+            //Addons.Add(new Mod.AvFav.FavButtons());
         }
 
         public override void OnUpdate()
@@ -69,7 +71,6 @@ namespace IceBurn
     {
         public static void Log(string message)
         {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write("[");
             Console.ForegroundColor = ConsoleColor.Green;
@@ -86,7 +87,6 @@ namespace IceBurn
         }
         public static void Error(string message)
         {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write("[");
             Console.ForegroundColor = ConsoleColor.Green;

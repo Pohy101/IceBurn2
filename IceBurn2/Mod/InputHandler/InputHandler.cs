@@ -21,64 +21,6 @@ namespace IceBurn.Mod.InputHandler
 
         }
 
-        void RNPlates(bool state)
-        {
-            try
-            {
-                if (!state)
-                {
-                    var allPlayers = PlayerWrapper.GetAllPlayers().ToArray();
-                    for (int i = 0; i < allPlayers.Length; i++)
-                    {
-                        Transform sRegion = allPlayers[i].transform.Find("SelectRegion");
-                        allPlayers[i].field_Internal_VRCPlayer_0.namePlateTalkSprite = allPlayers[i].field_Internal_VRCPlayer_0.namePlateSilentSprite;
-                        allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.green;
-
-                        if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Veteran user")
-                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * 0.5f, 1f), 1f, 1f)));
-                        else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Trusted user")
-                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.magenta);
-                        else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Known user")
-                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
-                        else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "User")
-                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.green);
-                        else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Visitor")
-                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.gray);
-
-                        if (sRegion != null)
-                            sRegion.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Color.red);
-
-                        if (allPlayers[i].field_Internal_VRCPlayer_0.prop_String_1 == "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223")
-                        {
-                            allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.black);
-                            allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.red;
-                            allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.clear;
-                            allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.red;
-                            allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.red;
-                        }
-                    }
-                }
-                else
-                {
-                    var allPlayers = PlayerWrapper.GetAllPlayers();
-                    for (int i = 0; i < allPlayers.Count; i++)
-                    {
-                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.red);
-                        allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.red;
-                        allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.red;
-                        allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.red;
-                        allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.clear;
-                        allPlayers[i].field_Internal_VRCPlayer_0.namePlateTalkSprite = allPlayers[i].field_Internal_VRCPlayer_0.namePlateSilentSprite;
-                    }
-                }
-            }
-            catch (System.Exception ex)
-            {
-                IceLogger.Log(ex.ToString());
-            }
-        }
-
-
         public override void OnUpdate()
         {
             // Включает или выключает полёт при нажатий на F
@@ -272,14 +214,6 @@ namespace IceBurn.Mod.InputHandler
                 if (System.Math.Abs(Input.GetAxis("Joy1 Axis 1")) > 0f)
                     player.transform.position += playercamera.transform.right * GlobalUtils.flySpeed * Time.deltaTime * Input.GetAxis("Joy1 Axis 1");
             }
-        }
-
-        public override void OnLateUpdate()
-        {
-            if (Input.anyKey)
-                PlayerWrapper.UpdateFriendList();
-            RNPlates(GlobalUtils.FakeNamePlate);
-            HighlightsFX.prop_HighlightsFX_0.field_Protected_Material_0.SetColor("_HighlightColor", Color.red);
         }
     }
 }
