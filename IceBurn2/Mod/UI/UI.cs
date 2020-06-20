@@ -10,8 +10,6 @@ using VRC;
 using VRC.UI;
 using System.Diagnostics;
 using IceBurn.Mod.Other;
-using System.Windows.Forms;
-using UnityEngine.Experimental.UIElements.StyleEnums;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
@@ -329,7 +327,7 @@ namespace IceBurn.Mod
                         else if (PlayerWrapper.GetTrustLevel(player) == "User")
                             tmpButton.setBackgroundColor(Color.green);
                         else if (PlayerWrapper.GetTrustLevel(player) == "New user")
-                            tmpButton.setBackgroundColor(Color.blue);
+                            tmpButton.setBackgroundColor(new Color(0.19f, 0.45f, 0.62f));
                         else if (PlayerWrapper.GetTrustLevel(player) == "Visitor")
                             tmpButton.setBackgroundColor(Color.gray);
 
@@ -379,7 +377,7 @@ namespace IceBurn.Mod
                         else if (PlayerWrapper.GetTrustLevel(player) == "User")
                             tmpButton.setBackgroundColor(Color.green);
                         else if (PlayerWrapper.GetTrustLevel(player) == "New user")
-                            tmpButton.setBackgroundColor(Color.blue);
+                            tmpButton.setBackgroundColor(new Color(0.19f, 0.45f, 0.62f));
                         else if (PlayerWrapper.GetTrustLevel(player) == "Visitor")
                             tmpButton.setBackgroundColor(Color.gray);
 
@@ -631,6 +629,8 @@ namespace IceBurn.Mod
                         allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
                     else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "User")
                         allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.green);
+                    else if(PlayerWrapper.GetTrustLevel(allPlayers[i]) == "New user")
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(new Color(0.3f, 0.72f, 1f));
                     else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Visitor")
                         allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.gray);
 

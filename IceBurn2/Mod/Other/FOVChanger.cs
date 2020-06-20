@@ -17,24 +17,27 @@ namespace IceBurn.Mod.Other
 
         public override void OnUpdate()
         {
-            if (Input.GetKey(KeyCode.X) && Input.GetKey(KeyCode.LeftAlt) && Input.mouseScrollDelta.y != 0f)
+            if (!VRCTrackingManager.Method_Public_Static_Boolean_11())
             {
-                GlobalUtils.cameraFOV -= (int)Input.mouseScrollDelta.y;
-                Wrapper.GetPlayerCamera().GetComponent<Camera>().fieldOfView = GlobalUtils.cameraFOV;
-                UI.resetFOV.setButtonText("Reset\nFOV\n[" + GlobalUtils.cameraFOV + "]");
-            }
+                if (Input.GetKey(KeyCode.X) && Input.GetKey(KeyCode.LeftAlt) && Input.mouseScrollDelta.y != 0f)
+                {
+                    GlobalUtils.cameraFOV -= (int)Input.mouseScrollDelta.y;
+                    Wrapper.GetPlayerCamera().GetComponent<Camera>().fieldOfView = GlobalUtils.cameraFOV;
+                    UI.resetFOV.setButtonText("Reset\nFOV\n[" + GlobalUtils.cameraFOV + "]");
+                }
 
-            if (GlobalUtils.cameraFOV > 100)
-            {
-                GlobalUtils.cameraFOV = 100;
-                Wrapper.GetPlayerCamera().GetComponent<Camera>().fieldOfView = GlobalUtils.cameraFOV;
-                UI.resetFOV.setButtonText("Reset\nFOV\n[" + GlobalUtils.cameraFOV + "]");
-            }
-            if (GlobalUtils.cameraFOV < 0f)
-            {
-                GlobalUtils.cameraFOV = 0;
-                Wrapper.GetPlayerCamera().GetComponent<Camera>().fieldOfView = GlobalUtils.cameraFOV;
-                UI.resetFOV.setButtonText("Reset\nFOV\n[" + GlobalUtils.cameraFOV + "]");
+                if (GlobalUtils.cameraFOV > 100)
+                {
+                    GlobalUtils.cameraFOV = 100;
+                    Wrapper.GetPlayerCamera().GetComponent<Camera>().fieldOfView = GlobalUtils.cameraFOV;
+                    UI.resetFOV.setButtonText("Reset\nFOV\n[" + GlobalUtils.cameraFOV + "]");
+                }
+                if (GlobalUtils.cameraFOV < 0f)
+                {
+                    GlobalUtils.cameraFOV = 0;
+                    Wrapper.GetPlayerCamera().GetComponent<Camera>().fieldOfView = GlobalUtils.cameraFOV;
+                    UI.resetFOV.setButtonText("Reset\nFOV\n[" + GlobalUtils.cameraFOV + "]");
+                }
             }
         }
     }

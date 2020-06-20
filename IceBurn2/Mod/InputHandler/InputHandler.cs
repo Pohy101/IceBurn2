@@ -1,13 +1,10 @@
 ﻿using IceBurn.Other;
 using IceBurn.Utils;
-using System;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC;
 using VRC.Core;
 using VRC.UI;
-using UnityEngine.UI;
-using Il2CppSystem;
 
 namespace IceBurn.Mod.InputHandler
 {
@@ -58,8 +55,8 @@ namespace IceBurn.Mod.InputHandler
                 }
             }
 
-            // Телепорт в точку которая находится на центре экрана по кнопку T
-            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Mouse0))
+            // Телепорт в точку которая находится на центре экрана по кнопку T || Shift + Mouse0
+            if ((Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Mouse0)) || Input.GetKeyDown(KeyCode.T))
                 GlobalUtils.RayTeleport();
 
             // Клонирование аватара на кнопку B [при выбранном игроке]
