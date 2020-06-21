@@ -5,6 +5,7 @@ using VRC.SDKBase;
 using VRC;
 using VRC.Core;
 using VRC.UI;
+using Il2CppSystem;
 
 namespace IceBurn.Mod.InputHandler
 {
@@ -27,8 +28,7 @@ namespace IceBurn.Mod.InputHandler
                 UI.toggleFly.setToggleState(GlobalUtils.Fly);
                 if (GlobalUtils.Fly)
                 {
-                    Physics.gravity = Vector3.zero;
-                    GlobalUtils.ToggleColliders(false);
+                    PlayerWrapper.GetCurrentPlayer().GetComponent<CharacterController>().enabled = false;
 
                     UI.flySpeedUp.setActive(true);
                     UI.flySpeedDown.setActive(true);
@@ -41,8 +41,7 @@ namespace IceBurn.Mod.InputHandler
                 }
                 else
                 {
-                    Physics.gravity = GlobalUtils.Gravity;
-                    GlobalUtils.ToggleColliders(true);
+                    PlayerWrapper.GetCurrentPlayer().GetComponent<CharacterController>().enabled = true;
 
                     UI.flySpeedUp.setActive(false);
                     UI.flySpeedDown.setActive(false);
@@ -177,8 +176,8 @@ namespace IceBurn.Mod.InputHandler
             // Управление во время полёта
             if (GlobalUtils.Fly)
             {
+                GameObject player = PlayerWrapper.GetCurrentPlayer().gameObject;
                 GameObject playercamera = Wrapper.GetPlayerCamera();
-                VRCPlayer player = PlayerWrapper.GetCurrentPlayer();
 
                 /*if (GlobalUtils.flySpeed <= 0)
                 {
@@ -194,10 +193,10 @@ namespace IceBurn.Mod.InputHandler
 
                 if (Input.GetKey(KeyCode.W))
                     player.transform.position += playercamera.transform.forward * GlobalUtils.flySpeed * Time.deltaTime;
-                if (Input.GetKey(KeyCode.S))
-                    player.transform.position -= playercamera.transform.forward * GlobalUtils.flySpeed * Time.deltaTime;
                 if (Input.GetKey(KeyCode.A))
                     player.transform.position -= playercamera.transform.right * GlobalUtils.flySpeed * Time.deltaTime;
+                if (Input.GetKey(KeyCode.S))
+                    player.transform.position -= playercamera.transform.forward * GlobalUtils.flySpeed * Time.deltaTime;
                 if (Input.GetKey(KeyCode.D))
                     player.transform.position += playercamera.transform.right * GlobalUtils.flySpeed * Time.deltaTime;
 

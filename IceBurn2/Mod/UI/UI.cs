@@ -153,8 +153,7 @@ namespace IceBurn.Mod
             "Fly ON", new Action(() =>
             {
                 GlobalUtils.Fly = true;
-                Physics.gravity = Vector3.zero;
-                GlobalUtils.ToggleColliders(false);
+                PlayerWrapper.GetCurrentPlayer().GetComponent<CharacterController>().enabled = false;
 
                 flySpeedUp.setActive(true);
                 flySpeedDown.setActive(true);
@@ -167,8 +166,7 @@ namespace IceBurn.Mod
             }), "Fly OFF", new Action(() =>
             {
                 GlobalUtils.Fly = false;
-                Physics.gravity = GlobalUtils.Gravity;
-                GlobalUtils.ToggleColliders(true);
+                PlayerWrapper.GetCurrentPlayer().GetComponent<CharacterController>().enabled = true;
 
                 flySpeedUp.setActive(false);
                 flySpeedDown.setActive(false);
