@@ -2,9 +2,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine.Events;
 
 namespace IceBurn.API
@@ -60,15 +57,15 @@ namespace IceBurn.API
 
     public class SocialSingleButton : SocialButtonBase
     {
-        public SocialSingleButton(String btnName, float btnXLocation, float btnYLocation, String btnText, System.Action btnAction, Color? btnBackgroundColor = null, Color? btnTextColor = null)
+        public SocialSingleButton(float btnXLocation, float btnYLocation, String btnText, System.Action btnAction, Color? btnBackgroundColor = null, Color? btnTextColor = null)
         {
-            btnQMLoc = btnName;
-            initButton(btnName, btnXLocation, btnYLocation, btnText, btnAction, btnBackgroundColor, btnTextColor);
+            initButton(btnXLocation, btnYLocation, btnText, btnAction, btnBackgroundColor, btnTextColor);
         }
 
-        private void initButton(String btnName, float btnXLocation, float btnYLocation, String btnText, System.Action btnAction, Color? btnBackgroundColor = null, Color? btnTextColor = null)
+        private void initButton(float btnXLocation, float btnYLocation, String btnText, System.Action btnAction, Color? btnBackgroundColor = null, Color? btnTextColor = null)
         {
-            button = UnityEngine.Object.Instantiate(GameObject.Find("/UserInterface/MenuContent/Screens/UserInfo/Friend Button"), GameObject.Find("/UserInterface/MenuContent/Screens/UserInfo/Friend Button").transform.parent);
+            GameObject screens = GameObject.Find("Screens");
+            button = UnityEngine.Object.Instantiate(screens.transform.Find("UserInfo/User Panel/Playlists/PlaylistsButton").gameObject, screens.transform.Find("UserInfo/User Panel/Playlists/PlaylistsButton").transform.parent);
 
             setLocation(btnXLocation, btnYLocation);
             setButtonText(btnText);

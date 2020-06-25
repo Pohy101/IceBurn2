@@ -10,6 +10,7 @@ using UnhollowerBaseLib;
 using UnityEngine;
 using VRC;
 using VRC.Core;
+using VRC.UI;
 
 namespace IceBurn.Utils
 {
@@ -86,6 +87,13 @@ namespace IceBurn.Utils
                     friend_list.Add(item);
                 }
             }
+        }
+
+        public static APIUser GetAPIUserFromSocialPage()
+        {
+            GameObject screens = GameObject.Find("Screens");
+            APIUser ourSelectedPlayer = screens.transform.Find("UserInfo").transform.GetComponentInChildren<PageUserInfo>().user;
+            return ourSelectedPlayer;
         }
 
         public static ulong GetSteamID (this VRCPlayer player)

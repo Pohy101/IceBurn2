@@ -2,7 +2,9 @@
 using System.Linq;
 using UnhollowerRuntimeLib;
 using UnityEngine;
+using VRC.Core;
 using VRC.SDKBase;
+using VRC.UI;
 
 namespace IceBurn.Utils
 {
@@ -13,6 +15,7 @@ namespace IceBurn.Utils
         public static bool ESP = false;
         public static int flySpeed = 5;
         public static float brightness = 1f;
+        public static float ownBrightness = 1f;
         public static int walkSpeed = 2;
         public static int cameraFOV = 65;
         public static Vector3 Gravity = Physics.gravity;

@@ -31,6 +31,8 @@ namespace IceBurn.Mod
         public static QMNestedButton speedHackMenu;
         public static QMNestedButton userUtilsMenu;
         public static QMNestedButton brightnessMenu;
+        public static QMNestedButton lightMenu;
+        public static QMNestedButton dropPortalMenu;
 
         // Кнопки Основного меню
         public static QMToggleButton toggleESP;
@@ -46,10 +48,7 @@ namespace IceBurn.Mod
         public static QMSingleButton deleteAllPortals;
         public static QMToggleButton toggleShadows;
         public static QMToggleButton toggleOptimizeMirror;
-        public static QMSingleButton hideAllVisitors;
-        public static QMToggleButton hideAllObjects;
-        public static QMSingleButton selfCrashCheck;
-        public static QMToggleButton invalid;
+        public static QMToggleButton toggleHand;
 
         // Кнопки Fly
         public static QMSingleButton resetflySpeed;
@@ -89,6 +88,14 @@ namespace IceBurn.Mod
         public static QMSingleButton crashCheck;
         public static QMSingleButton downloadVRCA;
 
+        // Кнопки OwnLight
+        public static QMToggleButton toggleOwnLight;
+        public static QMToggleButton toggleOwnLightShadows;
+        public static QMHalfButton ownLightIntUp;
+        public static QMHalfButton ownLightIntDown;
+        public static QMSingleButton ownLightIntReset;
+        public static QMSingleButton ownLightAdd;
+
         // Другие кнопки
         public static QMSingleButton quitApp;
 
@@ -100,6 +107,13 @@ namespace IceBurn.Mod
         private static List<GameObject> pointTeleportList = new List<GameObject>();
         private static List<QMHalfButton> tPointList = new List<QMHalfButton>();
 
+        // Hands
+        //static RootMotion.FinalIK.VRIK controller;
+        //public static Hand hand = Hand.None;
+
+        //PlayerLight
+        private static Light PlayerLight = new Light();
+
         public override void OnStart()
         {
             // Инициализация меню
@@ -110,6 +124,7 @@ namespace IceBurn.Mod
             FOVChangerMenu = new QMNestedButton(mainMenuP1, 1, 1, "FOV\nMenu", "Field Of View Menu");
             speedHackMenu = new QMNestedButton(mainMenuP1, 1, 2, "Player\nSpeed", "Speed Hack Menu");
             brightnessMenu = new QMNestedButton(mainMenuP2, 1, 1, "Light\nIntensity", "Set Light Intensity");
+            lightMenu = new QMNestedButton(mainMenuP2, 3, 1, "Light\nMenu", "User Light Menu");
             userUtilsMenu = new QMNestedButton("UserInteractMenu", 4, 2, "Utils", "User Utils");
 
             // Это просто нужно
@@ -118,10 +133,10 @@ namespace IceBurn.Mod
 
             // Инициализация кнопок
             resetflySpeed = new QMSingleButton(flyMenu, 2, 0, "Reset\nSpeed\n[" + GlobalUtils.flySpeed + "]", new Action(() =>
-            {
-                GlobalUtils.flySpeed = 5;
-                resetflySpeed.setButtonText("Reset\nSpeed\n[5]");
-            }), "Reset Fly Speed To Default");
+                {
+                    GlobalUtils.flySpeed = 5;
+                    resetflySpeed.setButtonText("Reset\nSpeed\n[5]");
+                }), "Reset Fly Speed To Default");
 
             flySpeedUp = new QMHalfButton(flyMenu, 3, -0.5f, "▲", new Action(() =>
             {
@@ -245,7 +260,10 @@ namespace IceBurn.Mod
                     if (avatar.releaseStatus != "private")
                         new PageAvatar { avatar = new SimpleAvatarPedestal { field_Internal_ApiAvatar_0 = new ApiAvatar { id = avatar.id } } }.ChangeToSelectedAvatar();
                     else
+                    {
                         IceLogger.Log("Avatar release status is PRIVATE!");
+                        Console.Beep();
+                    }
                     IceLogger.Log(avatar.id);
                 }
                 catch (Exception)
@@ -317,7 +335,7 @@ namespace IceBurn.Mod
                             tmpButton.setTextColor(Color.white);
 
                         if (PlayerWrapper.GetTrustLevel(player) == "Veteran user")
-                            tmpButton.setBackgroundColor(Color.cyan);
+                            tmpButton.setBackgroundColor(Color.red);
                         else if (PlayerWrapper.GetTrustLevel(player) == "Trusted user")
                             tmpButton.setBackgroundColor(Color.magenta);
                         else if (PlayerWrapper.GetTrustLevel(player) == "Known user")
@@ -367,7 +385,156 @@ namespace IceBurn.Mod
                             tmpButton.setTextColor(Color.white);
 
                         if (PlayerWrapper.GetTrustLevel(player) == "Veteran user")
-                            tmpButton.setBackgroundColor(Color.cyan);
+                            tmpButton.setBackgroundColor(Color.red);
+                        else if (PlayerWrapper.GetTrustLevel(player) == "Trusted user")
+                            tmpButton.setBackgroundColor(Color.magenta);
+                        else if (PlayerWrapper.GetTrustLevel(player) == "Known user")
+                            tmpButton.setBackgroundColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
+                        else if (PlayerWrapper.GetTrustLevel(player) == "User")
+                            tmpButton.setBackgroundColor(Color.green);
+                        else if (PlayerWrapper.GetTrustLevel(player) == "New user")
+                            tmpButton.setBackgroundColor(new Color(0.19f, 0.45f, 0.62f));
+                        else if (PlayerWrapper.GetTrustLevel(player) == "Visitor")
+                            tmpButton.setBackgroundColor(Color.gray);
+
+                        if (player.field_Private_APIUser_0.id == "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223" || player.field_Internal_VRCPlayer_0.prop_String_1 == PlayerWrapper.GetCurrentPlayer().prop_String_1)
+                        {
+                            tmpButton.setBackgroundColor(Color.black);
+                            tmpButton.setTextColor(Color.red);
+                        }
+
+                        localX++;
+                        if (localX > 5 && localY < 4f)
+                        {
+                            localX = 0;
+                            localY += 1f;
+                        }
+                        else if (localX > 5 && localY > 2f)
+                        {
+                            localX = 1;
+                            localY += 1f;
+                        }
+                        tPlayerList.Add(tmpButton);
+                    }
+                }
+            }), "Teleport To Player");
+
+            dropPortalMenu = new QMNestedButton(mainMenuP2, 4, 1, "Drop\nPortal", new Action(() =>
+            {
+                PlayerWrapper.UpdateFriendList();
+
+                // Remove old Buttons
+                foreach (QMHalfButton item in tPlayerList)
+                    item.DestroyMe();
+                tPlayerList.Clear();
+
+                // Get All Players
+                var players = PlayerWrapper.GetAllPlayers();
+
+                // REAdd Players to List
+                tmpPlayerList.Clear();
+                for (int i = 0; i < players.Count; i++)
+                    tmpPlayerList.Add(players[i]);
+
+                // Button Local Position
+                int localX = 0;
+                float localY = -0.5f;
+
+                if (tmpPlayerList.Count <= 24)
+                {
+                    localX = 1;
+                    foreach (Player player in tmpPlayerList)
+                    {
+                        QMHalfButton tmpButton = new QMHalfButton(dropPortalMenu, localX, localY, player.ToString(), new Action(() =>
+                        {
+                            if (player.field_Private_APIUser_0.id != "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223" || player.field_Internal_VRCPlayer_0.prop_String_1 != PlayerWrapper.GetCurrentPlayer().prop_String_1)
+                                try
+                                {
+                                    IceLogger.Log("Trying Drop TO: [" + player.ToString() + "]");
+                                    GameObject portal = Networking.Instantiate(VRC_EventHandler.VrcBroadcastType.Always, "Portals/PortalInternalDynamic", player.transform.position, player.transform.rotation);
+                                    Networking.RPC(RPC.Destination.AllBufferOne, portal, "ConfigurePortal", new Il2CppSystem.Object[]
+                                    {
+                                        (Il2CppSystem.String)"wrld_4432ea9b-729c-46e3-8eaf-846aa0a37fdd",
+                                        (Il2CppSystem.String)"72094",
+                                        new Il2CppSystem.Int32
+                                        {
+                                            m_value = 0
+                                        }.BoxIl2CppObject()
+                                    });
+                                }
+                                catch (Exception ex)
+                                {
+                                    IceLogger.Error(ex.ToString());
+                                }
+                        }), "Drop Portal To " + player.ToString());
+
+                        if (PlayerWrapper.isFriend(player.field_Internal_VRCPlayer_0.prop_Player_0))
+                            tmpButton.setTextColor(Color.green);
+                        else
+                            tmpButton.setTextColor(Color.white);
+
+                        if (PlayerWrapper.GetTrustLevel(player) == "Veteran user")
+                            tmpButton.setBackgroundColor(Color.red);
+                        else if (PlayerWrapper.GetTrustLevel(player) == "Trusted user")
+                            tmpButton.setBackgroundColor(Color.magenta);
+                        else if (PlayerWrapper.GetTrustLevel(player) == "Known user")
+                            tmpButton.setBackgroundColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
+                        else if (PlayerWrapper.GetTrustLevel(player) == "User")
+                            tmpButton.setBackgroundColor(Color.green);
+                        else if (PlayerWrapper.GetTrustLevel(player) == "New user")
+                            tmpButton.setBackgroundColor(new Color(0.19f, 0.45f, 0.62f));
+                        else if (PlayerWrapper.GetTrustLevel(player) == "Visitor")
+                            tmpButton.setBackgroundColor(Color.gray);
+
+                        if (player.field_Private_APIUser_0.id == "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223" || player.field_Internal_VRCPlayer_0.prop_String_1 == PlayerWrapper.GetCurrentPlayer().prop_String_1)
+                        {
+                            tmpButton.setBackgroundColor(Color.black);
+                            tmpButton.setTextColor(Color.red);
+                        }
+
+                        localX++;
+                        if (localX > 4)
+                        {
+                            localX = 1;
+                            localY += 1f;
+                        }
+                        tPlayerList.Add(tmpButton);
+                    }
+                }
+                else
+                {
+                    foreach (Player player in tmpPlayerList)
+                    {
+                        QMHalfButton tmpButton = new QMHalfButton(dropPortalMenu, localX, localY, player.ToString(), new Action(() =>
+                        {
+                            if (player.field_Private_APIUser_0.id != "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223" || player.field_Internal_VRCPlayer_0.prop_String_1 != PlayerWrapper.GetCurrentPlayer().prop_String_1)
+                                try
+                                {
+                                    IceLogger.Log("Trying Drop TO: [" + player.ToString() + "]");
+                                    GameObject portal = Networking.Instantiate(VRC_EventHandler.VrcBroadcastType.Always, "Portals/PortalInternalDynamic", player.transform.position, player.transform.rotation);
+                                    Networking.RPC(RPC.Destination.AllBufferOne, portal, "ConfigurePortal", new Il2CppSystem.Object[]
+                                    {
+                                        (Il2CppSystem.String)"wrld_4432ea9b-729c-46e3-8eaf-846aa0a37fdd",
+                                        (Il2CppSystem.String)"72094",
+                                        new Il2CppSystem.Int32
+                                        {
+                                            m_value = 0
+                                        }.BoxIl2CppObject()
+                                    });
+                                }
+                                catch (Exception ex)
+                                {
+                                    IceLogger.Error(ex.ToString());
+                                }
+                        }), "Teleport To " + player.ToString());
+
+                        if (PlayerWrapper.isFriend(player.field_Internal_VRCPlayer_0.prop_Player_0))
+                            tmpButton.setTextColor(Color.green);
+                        else
+                            tmpButton.setTextColor(Color.white);
+
+                        if (PlayerWrapper.GetTrustLevel(player) == "Veteran user")
+                            tmpButton.setBackgroundColor(Color.red);
                         else if (PlayerWrapper.GetTrustLevel(player) == "Trusted user")
                             tmpButton.setBackgroundColor(Color.magenta);
                         else if (PlayerWrapper.GetTrustLevel(player) == "Known user")
@@ -620,14 +787,14 @@ namespace IceBurn.Mod
                     allPlayers[i].field_Internal_VRCPlayer_0.namePlateTalkSprite = allPlayers[i].field_Internal_VRCPlayer_0.namePlateSilentSprite;
 
                     if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Veteran user")
-                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.cyan);
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.red);
                     else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Trusted user")
                         allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.magenta);
                     else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Known user")
                         allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
                     else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "User")
                         allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.green);
-                    else if(PlayerWrapper.GetTrustLevel(allPlayers[i]) == "New user")
+                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "New user")
                         allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(new Color(0.3f, 0.72f, 1f));
                     else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Visitor")
                         allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.gray);
@@ -701,7 +868,6 @@ namespace IceBurn.Mod
                 foreach (Light light in Resources.FindObjectsOfTypeAll<Light>())
                 {
                     light.shadows = LightShadows.Soft;
-                    light.m_BakedIndex = 0;
                     light.shadowResolution = UnityEngine.Rendering.LightShadowResolution.High;
                 }
             }), "Shadows OFF", new Action(() =>
@@ -763,7 +929,7 @@ namespace IceBurn.Mod
 
             brightnessUp = new QMHalfButton(brightnessMenu, 2, -0.5f, "▲", new Action(() =>
             {
-                GlobalUtils.brightness += 0.1f;
+                GlobalUtils.brightness += (1f / 10f);
                 foreach (Light light in Resources.FindObjectsOfTypeAll<Light>())
                 {
                     light.intensity = GlobalUtils.brightness;
@@ -773,7 +939,7 @@ namespace IceBurn.Mod
 
             brightnessDown = new QMHalfButton(brightnessMenu, 2, 0.5f, "▼", new Action(() =>
             {
-                GlobalUtils.brightness -= 0.1f;
+                GlobalUtils.brightness -= (1f / 10f);
                 foreach (Light light in Resources.FindObjectsOfTypeAll<Light>())
                 {
                     light.intensity = GlobalUtils.brightness;
@@ -791,46 +957,92 @@ namespace IceBurn.Mod
                 resetBrightness.setButtonText("Reset\nBrightness\n[" + GlobalUtils.brightness + "]");
             }), "Reset To Default Brightness");
 
-            hideAllVisitors = new QMSingleButton(mainMenuP2, 2, 1, "Remove\nVisitors", new Action(() =>
+            toggleHand = new QMToggleButton(mainMenuP2, 2, 1, "Hand ON", new Action(() =>
             {
-                var allPlayers = PlayerWrapper.GetAllPlayers().ToArray();
-                for (int i = 0; i < allPlayers.Length; i++)
+                /*controller = PlayerWrapper.GetCurrentPlayer().prop_Player_0.prop_VRCAvatarManager_0.prop_GameObject_0.GetComponent<RootMotion.FinalIK.VRIK>();
+                if (Input.GetMouseButton(1))
                 {
-                    if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Visitor")
+                    if (controller != null)
                     {
-                        PlayerWrapper.RemoveAvatar(allPlayers[i].field_Internal_VRCPlayer_0.field_Private_Player_0);
-                        Destroy(allPlayers[i].field_Internal_VRCPlayer_0.namePlate.gameObject);
+                        switch (hand)
+                        {
+                            case Hand.Left:
+                                controller.solver.leftArm.positionWeight = 1;
+                                controller.solver.leftArm.rotationWeight = 1;
+                                break;
+                            case Hand.Right:
+                                controller.solver.rightArm.positionWeight = 1;
+                                controller.solver.rightArm.rotationWeight = 1;
+                                break;
+                            case Hand.Both:
+                                controller.solver.leftArm.positionWeight = 1;
+                                controller.solver.leftArm.rotationWeight = 1;
+                                controller.solver.rightArm.positionWeight = 1;
+                                controller.solver.rightArm.rotationWeight = 1;
+                                break;
+                            default:
+                                break;
+                        }
                     }
-                }
-            }), "Show Visitors");
-            hideAllObjects = new QMToggleButton(mainMenuP2, 3, 1, "Hide Objects", new Action(() =>
+                }*/
+            }), "Hand OFF", new Action(() =>
             {
-                foreach (VRC_Pickup pickup in Resources.FindObjectsOfTypeAll<VRC_Pickup>())
-                    pickup.gameObject.GetComponent<MeshRenderer>().enabled = false;
-            }), "Show Objects", new Action(() =>
-            {
-                foreach (VRC_Pickup pickup in Resources.FindObjectsOfTypeAll<VRC_Pickup>())
-                    pickup.gameObject.GetComponent<MeshRenderer>().enabled = true;
-            }), "Toggle VRC_Pickup Objects");
 
-            selfCrashCheck = new QMSingleButton(mainMenuP2, 4, 1, "Self\nCrash\nCheck", new Action(() =>
-            {
-                anticrash.particle_check(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0);
-                anticrash.polygon_check(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0, Wrapper.get_poly(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0));
-                anticrash.shader_check(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0);
-                anticrash.mesh_check(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0);
-                anticrash.mats_check(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0);
-                anticrash.work_hk(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0, Wrapper.get_poly(PlayerWrapper.GetCurrentPlayer().field_Private_Player_0));
-                IceLogger.Log("Player " + PlayerWrapper.GetCurrentPlayer().field_Private_Player_0.field_Private_String_0 + " Checked");
-            }), "Self Crash Check");
+            }), "Toggle Sphere For Desktop Hand");
 
-            invalid = new QMToggleButton(mainMenuP2, 1, 2, "Invalid?", new Action(() =>
+            toggleOwnLight = new QMToggleButton(lightMenu, 1, 0, "Light ON", new Action(() =>
             {
-                UnityEngine.Application.targetFrameRate = 1;
-            }), "Maybe", new Action(() =>
+                PlayerLight.enabled = true;
+            }), "Light OFF", new Action(() =>
             {
-                UnityEngine.Application.targetFrameRate = 144;
-            }), "Are you invalid bleat?");
+                PlayerLight.enabled = false;
+            }), "Toggle Own Light");
+
+            toggleOwnLightShadows = new QMToggleButton(lightMenu, 1, 1, "Shadows ON", new Action(() =>
+            {
+                PlayerLight.shadows = LightShadows.Soft;
+                PlayerLight.shadowResolution = UnityEngine.Rendering.LightShadowResolution.VeryHigh;
+            }), "Shadows OFF", new Action(() =>
+            {
+                PlayerLight.shadows = LightShadows.None;
+            }), "Toggle Own Shadow");
+
+            ownLightIntUp = new QMHalfButton(lightMenu, 2, -0.5f, "▲", new Action(() =>
+            {
+                GlobalUtils.ownBrightness += 1f / 10f;
+                ownLightIntReset.setButtonText("Reset\nInt\n[" + GlobalUtils.ownBrightness + "]");
+                PlayerLight.intensity = GlobalUtils.ownBrightness;
+            }), "Light Int UP");
+
+            ownLightIntDown = new QMHalfButton(lightMenu, 2, 0.5f, "▼", new Action(() =>
+            {
+                if (GlobalUtils.ownBrightness <= 0)
+                    GlobalUtils.ownBrightness = 0.1f;
+                GlobalUtils.ownBrightness -= 1f / 10f;
+                ownLightIntReset.setButtonText("Reset\nInt\n[" + GlobalUtils.ownBrightness + "]");
+                PlayerLight.intensity = GlobalUtils.ownBrightness;
+            }), "Light Int DOWN");
+
+            ownLightIntReset = new QMSingleButton(lightMenu, 3, 0, "Reset\nInt\n[" + GlobalUtils.ownBrightness + "]", new Action(() =>
+            {
+                GlobalUtils.ownBrightness = 1f;
+                PlayerLight.intensity = GlobalUtils.ownBrightness;
+                ownLightIntReset.setButtonText("Reset\nInt\n[" + GlobalUtils.ownBrightness + "]");
+            }), "Reset Own Light Int");
+
+            ownLightAdd = new QMSingleButton(lightMenu, 4, 0, "Init\nLight", new Action(() =>
+            {
+                VRCPlayer player = PlayerWrapper.GetCurrentPlayer();
+                GameObject def = Instantiate(new GameObject() , player.transform);
+                def.transform.position = player.transform.position + (player.transform.forward * 0.5f) + player.transform.up;
+                PlayerLight = def.AddComponent<Light>();
+                PlayerLight.type = LightType.Point;
+                PlayerLight.intensity = 1.0f;
+                PlayerLight.enabled = false;
+                IceLogger.Log("Light XPos: " + def.transform.position.x);
+                IceLogger.Log("Light YPos: " + def.transform.position.y);
+                IceLogger.Log("Light ZPos: " + def.transform.position.z);
+            }), "USE ONE TIME!");
 
             // Initial State
             toggleFly.setToggleState(false);
@@ -846,9 +1058,16 @@ namespace IceBurn.Mod
                 FOVChangerMenu.getMainButton().setBackgroundColor(Color.gray);
                 FOVChangerMenu.getMainButton().setTextColor(Color.red);
                 FOVChangerMenu.getMainButton().setAction(null);
+
+                /*toggleHand.setBackgroundColor(Color.gray);
+                toggleHand.setTextColor(Color.red);
+                toggleHand.setAction(null, null);*/
             }
             else
+            {
                 FOVChangerMenu.getMainButton().setActive(true);
+                FOVChanger.isPC = false;
+            }
         }
     }
 }

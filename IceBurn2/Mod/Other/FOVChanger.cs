@@ -9,6 +9,7 @@ namespace IceBurn.Mod.Other
         public override string Name => "FOV Changer";
         public override string Description => "Changes Field Of View";
 
+        public static bool isPC = false;
 
         public override void OnStart()
         {
@@ -17,7 +18,7 @@ namespace IceBurn.Mod.Other
 
         public override void OnUpdate()
         {
-            if (!VRCTrackingManager.Method_Public_Static_Boolean_11())
+            if (isPC)
             {
                 if (Input.GetKey(KeyCode.X) && Input.GetKey(KeyCode.LeftAlt) && Input.mouseScrollDelta.y != 0f)
                 {

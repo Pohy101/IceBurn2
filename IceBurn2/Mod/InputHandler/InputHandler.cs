@@ -1,5 +1,6 @@
 ﻿using IceBurn.Other;
 using IceBurn.Utils;
+using Console = System.Console;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC;
@@ -70,6 +71,7 @@ namespace IceBurn.Mod.InputHandler
                     else
                     {
                         IceLogger.Log("Avatar release status is PRIVATE!");
+                        Console.Beep();
                     }
                     IceLogger.Log(avatar.id);
                 }

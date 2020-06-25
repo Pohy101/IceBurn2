@@ -59,22 +59,22 @@ internal class DiscordRpc
         Ignore
     }
 
-    [DllImport("Dependencies/discord-rpc.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "Discord_Initialize")]
+    [DllImport("UserData\\IceBurn2\\Dependencies\\discord-rpc.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "Discord_Initialize")]
     public static extern void Initialize(string applicationId, ref DiscordRpc.EventHandlers handlers, bool autoRegister, string optionalSteamId);
 
-    [DllImport("Dependencies/discord-rpc.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "Discord_Shutdown")]
+    [DllImport("UserData\\IceBurn2\\Dependencies\\discord-rpc.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "Discord_Shutdown")]
     public static extern void Shutdown();
 
-    [DllImport("Dependencies/discord-rpc.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "Discord_RunCallbacks")]
+    [DllImport("UserData\\IceBurn2\\Dependencies\\discord-rpc.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "Discord_RunCallbacks")]
     public static extern void RunCallbacks();
 
-    [DllImport("Dependencies/discord-rpc.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "Discord_UpdatePresence")]
+    [DllImport("UserData\\IceBurn2\\Dependencies\\discord-rpc.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "Discord_UpdatePresence")]
     public static extern void UpdatePresence(ref DiscordRpc.RichPresence presence);
 
-    [DllImport("Dependencies/discord-rpc.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "Discord_ClearPresence")]
+    [DllImport("UserData\\IceBurn2\\Dependencies\\discord-rpc.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "Discord_ClearPresence")]
     public static extern void ClearPresence();
 
-    [DllImport("Dependencies/discord-rpc.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "Discord_Respond")]
+    [DllImport("UserData\\IceBurn2\\Dependencies\\discord-rpc.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "Discord_Respond")]
     public static extern void Respond(string userId, DiscordRpc.Reply reply);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

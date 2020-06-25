@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="API\FavoriteButtonAPI.cs" />
@@ -39,9 +41,6 @@
     <Compile Include="Forms\TestForm.Designer.cs">
       <DependentUpon>TestForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mod\AvFav\Config.cs" />
-    <Compile Include="Mod\AvFav\FavButtons.cs" />
-    <Compile Include="Mod\AvFav\SavedAvi.cs" />
     <Compile Include="Mod\Other\AntiCrash.cs" />
     <Compile Include="Mod\Other\dynbones.cs" />
     <Compile Include="Mod\UI\UI.cs" />
@@ -49,7 +48,6 @@
     <Compile Include="Core\main.cs" />
     <Compile Include="Mod\Other\Discord.cs" />
     <Compile Include="Mod\Other\FOVChanger.cs" />
-    <Compile Include="Mod\UI\GUI.cs" />
     <Compile Include="Mod\InputHandler\InputHandler.cs" />
     <Compile Include="API\IceButtonAPI.cs" />
     <Compile Include="Other\SaveLoad.cs" />
@@ -99,6 +97,10 @@
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.AnimationModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
@@ -113,6 +115,7 @@
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.UI.dll</HintPath>
@@ -120,9 +123,11 @@
     </Reference>
     <Reference Include="UnityEngine.UIElementsModule">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.UIElementsModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.UIModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="VRCCore-Editor">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\VRCCore-Editor.dll</HintPath>
@@ -145,6 +150,9 @@
     <EmbeddedResource Include="Forms\TestForm.resx">
       <DependentUpon>TestForm.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mod\AvFav\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

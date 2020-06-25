@@ -20,26 +20,7 @@ namespace IceBurn.Mod.AvFav
         public static AvatarListApi CustomList;
 
         public override void OnStart()
-        {
-            CustomList = AvatarListApi.Create(Config.CFG.CustomName + " / " + Config.DAvatars.Count, 1);
-            CustomList.AList.FirstLoad(Config.DAvatars);
-
-            Il2CppSystem.Delegate test = (Il2CppSystem.Action<string, GameObject, VRCSDK2.Validation.Performance.Stats.AvatarPerformanceStats>)new Action<string, GameObject, VRCSDK2.Validation.Performance.Stats.AvatarPerformanceStats>((x, y, z) =>
-            {
-                if (Config.DAvatars.Any(v => v.AvatarID == CustomList.AList.avatarPedestal.field_Internal_ApiAvatar_0.id))
-                {
-                    AddRemoveFavorite.setButtonText(Config.CFG.RemoveFavoriteTXT);
-                    CustomList.ListTitle.text = Config.CFG.CustomName + " / " + Config.DAvatars.Count;
-                }
-                else
-                {
-                    AddRemoveFavorite.setButtonText(Config.CFG.AddFavoriteTXT);
-                    CustomList.ListTitle.text = Config.CFG.CustomName + " / " + Config.DAvatars.Count;
-                }
-            });
-
-            CustomList.AList.avatarPedestal.field_Internal_Action_3_String_GameObject_AvatarPerformanceStats_0 = Il2CppSystem.Delegate.Combine(CustomList.AList.avatarPedestal.field_Internal_Action_3_String_GameObject_AvatarPerformanceStats_0, test).Cast<Il2CppSystem.Action<string, GameObject, VRCSDK2.Validation.Performance.Stats.AvatarPerformanceStats>>();
-
+        {            
             ShowAuthor = new FavSingleButton("ShowAuthor", 0f, -684f, "Show Author", new Action(() =>
             {
                 VRCUiManager.prop_VRCUiManager_0.Method_Public_Void_Boolean_0(true);
@@ -54,6 +35,8 @@ namespace IceBurn.Mod.AvFav
             {
                 Process.Start(AvatarListApi.AviList.avatarPedestal.field_Internal_ApiAvatar_0.assetUrl);
             }));
+
+            InitialLoad();
 
             AddRemoveFavorite = new FavSingleButton("AddRemoveFavorite", 0f, -80f, Config.CFG.AddFavoriteTXT, new Action(() =>
             {
@@ -77,6 +60,28 @@ namespace IceBurn.Mod.AvFav
                     }
                 }
             }));
+        }
+
+        private void InitialLoad()
+        {
+            CustomList = AvatarListApi.Create(Config.CFG.CustomName + " / " + Config.DAvatars.Count, 1);
+            CustomList.AList.FirstLoad(Config.DAvatars);
+
+            Il2CppSystem.Delegate test = (Il2CppSystem.Action<string, GameObject, VRCSDK2.Validation.Performance.Stats.AvatarPerformanceStats>)new Action<string, GameObject, VRCSDK2.Validation.Performance.Stats.AvatarPerformanceStats>((x, y, z) =>
+            {
+                if (Config.DAvatars.Any(v => v.AvatarID == CustomList.AList.avatarPedestal.field_Internal_ApiAvatar_0.id))
+                {
+                    AddRemoveFavorite.setButtonText(Config.CFG.RemoveFavoriteTXT);
+                    CustomList.ListTitle.text = Config.CFG.CustomName + " / " + Config.DAvatars.Count;
+                }
+                else
+                {
+                    AddRemoveFavorite.setButtonText(Config.CFG.AddFavoriteTXT);
+                    CustomList.ListTitle.text = Config.CFG.CustomName + " / " + Config.DAvatars.Count;
+                }
+            });
+
+            CustomList.AList.avatarPedestal.field_Internal_Action_3_String_GameObject_AvatarPerformanceStats_0 = Il2CppSystem.Delegate.Combine(CustomList.AList.avatarPedestal.field_Internal_Action_3_String_GameObject_AvatarPerformanceStats_0, test).Cast<Il2CppSystem.Action<string, GameObject, VRCSDK2.Validation.Performance.Stats.AvatarPerformanceStats>>();
         }
 
         public override void OnUpdate()
