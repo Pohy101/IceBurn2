@@ -20,6 +20,10 @@ namespace IceBurn.Utils
         public static int cameraFOV = 65;
         public static Vector3 Gravity = Physics.gravity;
 
+        // Доступ к клиенту
+        public static bool CanUseClient = false;
+        public static bool CanUseAll = false;
+
         // Anti Crash preset
         public static int max_polygons = 500000;
         public static int max_particles = 30000;

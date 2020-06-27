@@ -9,8 +9,6 @@ namespace IceBurn.Other
 {
     public class VRmod : MonoBehaviour
     {
-        public virtual string Name => "Test";
-        public virtual string Description => "";
         public virtual void OnStart() { }
         public virtual void OnUpdate() { }
         public virtual void OnFixedUpdate() { }

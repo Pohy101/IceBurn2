@@ -1,8 +1,6 @@
 ﻿using System;
-using IceBurn;
+using Logger;
 using VRC.Core;
-using MelonLoader;
-using UnityEngine;
 
 namespace DiscordRichPresence
 {

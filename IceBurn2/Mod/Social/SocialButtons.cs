@@ -1,43 +1,49 @@
 ﻿using IceBurn.API;
 using IceBurn.Other;
 using IceBurn.Utils;
-using Newtonsoft.Json.Serialization;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using VRC;
 using VRC.Core;
 using VRC.SDKBase;
-using VRC.UI;
+using Logger;
 
 namespace IceBurn.Mod.Social
 {
     class SocialButtons : VRmod
     {
-        public override string Name => "Avatar UI";
-        public override string Description => "creates buttons in QM User Interface";
-
         public static SocialSingleButton cloneAvatarFromSocial;
         public static SocialSingleButton DropPortalToPlayer;
+        public static SocialSingleButton ForceJoinToPlayer;
 
         public override void OnStart()
         {
-            cloneAvatarFromSocial = new SocialSingleButton(-820f, 320f, "CloneAvatar", new Action(() =>
+            cloneAvatarFromSocial = new SocialSingleButton(-820f, 400f, "CloneAvatar", new Action(() =>
+            {
+                /*APIUser ourSelectedPlayer = PlayerWrapper.GetAPIUserFromSocialPage();
+                ApiAvatar avatar = PlayerWrapper.GetPlayer(ourSelectedPlayer.id).field_Internal_VRCPlayer_0.prop_ApiAvatar_0;
+
+                if (avatar.releaseStatus != "private")
+                    new PageAvatar { avatar = new SimpleAvatarPedestal { field_Internal_ApiAvatar_0 = new ApiAvatar { id = avatar.id } } }.ChangeToSelectedAvatar();
+                else
+                {
+                    IceLogger.Log("Avatar release status is PRIVATE!");
+                    Console.Beep();
+                }
+                IceLogger.Log(avatar.id);*/
+
+                APIUser ourSelectedPlayer = PlayerWrapper.GetAPIUserFromSocialPage();
+                IceLogger.Log("Avatar ID:" + ourSelectedPlayer.avatarId);
+                IceLogger.Log("Blob:" + ourSelectedPlayer.blob);
+                IceLogger.Log("Asset URL:" + ourSelectedPlayer.currentAvatarAssetUrl);
+                IceLogger.Log("ThumbnailImage URL:" + ourSelectedPlayer.currentAvatarThumbnailImageUrl);
+                IceLogger.Log("Image URL:" + ourSelectedPlayer.currentAvatarImageUrl);
+            }));
+
+            ForceJoinToPlayer = new SocialSingleButton(-1030, 400f, "Force Join", new Action(() =>
             {
                 APIUser ourSelectedPlayer = PlayerWrapper.GetAPIUserFromSocialPage();
-                try
-                {
-                    new PageAvatar { avatar = new SimpleAvatarPedestal { field_Internal_ApiAvatar_0 = new ApiAvatar { id = ourSelectedPlayer.avatarId } } }.ChangeToSelectedAvatar();
-                    IceLogger.Log(ourSelectedPlayer.avatarId);
-                }
-                catch (Exception)
-                {
-                    IceLogger.Error("User not selected!");
-                    throw;
-                }
+                if (ourSelectedPlayer.location != null && ourSelectedPlayer.location != "")
+                    IceLogger.Log(ourSelectedPlayer.username + "'s Location: " + ourSelectedPlayer.location);
             }));
 
             DropPortalToPlayer = new SocialSingleButton(0, -76.0f, "Drop portal To", new Action(() =>

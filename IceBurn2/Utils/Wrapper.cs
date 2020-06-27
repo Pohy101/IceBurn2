@@ -197,8 +197,8 @@ namespace IceBurn.Utils
 
         public static Player GetSelectedPlayer(this QuickMenu instance)
         {
-            APIUser APIUser = instance.field_Private_APIUser_0;
-            return PlayerWrapper.GetPlayer(APIUser.id);
+            APIUser apiUser = instance.field_Private_APIUser_0;
+            return PlayerWrapper.GetPlayer(apiUser.id);
         }
 
         public static int get_meshes(Player p)

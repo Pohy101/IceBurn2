@@ -1,6 +1,5 @@
 ﻿using MelonLoader;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
@@ -11,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("IceBurn2")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyCopyright("Copyright © 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -35,5 +34,5 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: MelonModInfo(typeof(IceBurn.main), "IceBurn2", "2.6.0", "IceFox", "Public")]
+[assembly: MelonModInfo(typeof(IceBurn.Main), "IceBurn", "2.0.0", "IceFox", "https://discord.gg/VCbeWNW")]
 [assembly: MelonModGame("VRChat", "VRChat")]

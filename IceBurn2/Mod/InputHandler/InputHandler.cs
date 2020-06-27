@@ -6,15 +6,13 @@ using VRC.SDKBase;
 using VRC;
 using VRC.Core;
 using VRC.UI;
-using Il2CppSystem;
+using Logger;
+using System.Linq;
 
 namespace IceBurn.Mod.InputHandler
 {
     class InputHandler : VRmod
     {
-        public override string Name => "Inputs";
-        public override string Description => "Inputs handling from here";
-
         public override void OnStart()
         {
 
@@ -62,10 +60,9 @@ namespace IceBurn.Mod.InputHandler
             // Клонирование аватара на кнопку B [при выбранном игроке]
             if (Input.GetKeyDown(KeyCode.B))
             {
-                try
+                if (Wrapper.GetQuickMenu().GetSelectedPlayer() != null)
                 {
                     ApiAvatar avatar = Wrapper.GetQuickMenu().GetSelectedPlayer().field_Internal_VRCPlayer_0.prop_ApiAvatar_0;
-
                     if (avatar.releaseStatus != "private")
                         new PageAvatar { avatar = new SimpleAvatarPedestal { field_Internal_ApiAvatar_0 = new ApiAvatar { id = avatar.id } } }.ChangeToSelectedAvatar();
                     else
@@ -75,11 +72,8 @@ namespace IceBurn.Mod.InputHandler
                     }
                     IceLogger.Log(avatar.id);
                 }
-                catch (System.Exception)
-                {
+                else
                     IceLogger.Error("User not selected!");
-                    throw;
-                }
             }
 
             // ESP или видеть игроков сквазь стены на кнопку O
@@ -156,6 +150,60 @@ namespace IceBurn.Mod.InputHandler
             if (Input.GetKeyDown(KeyCode.H))
             {
 
+            }
+
+            if (Input.GetKeyDown(KeyCode.Y))
+            {
+                (from portal in Resources.FindObjectsOfTypeAll<PortalInternal>()
+                 where portal.gameObject.activeInHierarchy && !portal.gameObject.GetComponentInParent<VRC_PortalMarker>()
+                 select portal).ToList<PortalInternal>().ForEach(delegate (PortalInternal p)
+                 {
+                     Player component = Networking.GetOwner(p.gameObject).gameObject.GetComponent<Player>();
+                     UnityEngine.Object.Destroy(p.transform.root.gameObject);
+                 });
+            }
+
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                PlayerWrapper.UpdateFriendList();
+
+                var allPlayers = PlayerWrapper.GetAllPlayers().ToArray();
+                for (int i = 0; i < allPlayers.Length; i++)
+                {
+                    Transform sRegion = allPlayers[i].transform.Find("SelectRegion");
+                    allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.green;
+                    allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.white;
+                    allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.white;
+                    allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.black;
+                    allPlayers[i].field_Internal_VRCPlayer_0.namePlateTalkSprite = allPlayers[i].field_Internal_VRCPlayer_0.namePlateSilentSprite;
+
+                    if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Veteran user")
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.red);
+                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Trusted user")
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.magenta);
+                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Known user")
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
+                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "User")
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.green);
+                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "New user")
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(new Color(0.3f, 0.72f, 1f));
+                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Visitor")
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.gray);
+
+                    if (sRegion != null)
+                        sRegion.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Color.red);
+
+                    HighlightsFX.prop_HighlightsFX_0.field_Protected_Material_0.SetColor("_HighlightColor", Color.red);
+
+                    if (allPlayers[i].field_Internal_VRCPlayer_0.prop_String_1 == "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223")
+                    {
+                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.black);
+                        allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.red;
+                        allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.clear;
+                        allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.red;
+                        allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.red;
+                    }
+                }
             }
 
             if (GlobalUtils.walkSpeed <= 0)

@@ -12,14 +12,12 @@ using System.Diagnostics;
 using IceBurn.Mod.Other;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using Logger;
 
 namespace IceBurn.Mod
 {
     class UI : VRmod
     {
-        public override string Name => "QM User Interface";
-        public override string Description => "creates buttons in QM User Interface";
-
         // Менюшки
         public static QMNestedButton mainMenuP1;
         public static QMNestedButton mainMenuP2;
@@ -49,6 +47,7 @@ namespace IceBurn.Mod
         public static QMToggleButton toggleShadows;
         public static QMToggleButton toggleOptimizeMirror;
         public static QMToggleButton toggleHand;
+        public static QMToggleButton toggleGDB;
 
         // Кнопки Fly
         public static QMSingleButton resetflySpeed;
@@ -454,8 +453,9 @@ namespace IceBurn.Mod
                                     GameObject portal = Networking.Instantiate(VRC_EventHandler.VrcBroadcastType.Always, "Portals/PortalInternalDynamic", player.transform.position, player.transform.rotation);
                                     Networking.RPC(RPC.Destination.AllBufferOne, portal, "ConfigurePortal", new Il2CppSystem.Object[]
                                     {
-                                        (Il2CppSystem.String)"wrld_4432ea9b-729c-46e3-8eaf-846aa0a37fdd",
-                                        (Il2CppSystem.String)"72094",
+                                        (Il2CppSystem.String)"wrld_5b89c79e-c340-4510-be1b-476e9fcdedcc",
+                                        //(Il2CppSystem.String)Clipboard.GetText(),
+                                        (Il2CppSystem.String)"99999",
                                         new Il2CppSystem.Int32
                                         {
                                             m_value = 0
@@ -514,8 +514,8 @@ namespace IceBurn.Mod
                                     GameObject portal = Networking.Instantiate(VRC_EventHandler.VrcBroadcastType.Always, "Portals/PortalInternalDynamic", player.transform.position, player.transform.rotation);
                                     Networking.RPC(RPC.Destination.AllBufferOne, portal, "ConfigurePortal", new Il2CppSystem.Object[]
                                     {
-                                        (Il2CppSystem.String)"wrld_4432ea9b-729c-46e3-8eaf-846aa0a37fdd",
-                                        (Il2CppSystem.String)"72094",
+                                        (Il2CppSystem.String)"wrld_5b89c79e-c340-4510-be1b-476e9fcdedcc",
+                                        (Il2CppSystem.String)"99999",
                                         new Il2CppSystem.Int32
                                         {
                                             m_value = 0
@@ -1043,6 +1043,15 @@ namespace IceBurn.Mod
                 IceLogger.Log("Light YPos: " + def.transform.position.y);
                 IceLogger.Log("Light ZPos: " + def.transform.position.z);
             }), "USE ONE TIME!");
+
+            toggleGDB = new QMToggleButton(mainMenuP2, 1, 2, "GDB ON", new Action(() =>
+            {
+                Bones.GDB.ToggleGDBState();
+            }), "GDB OFF", new Action(() =>
+            {
+                Bones.GDB.ToggleGDBState();
+            }), "Toggle GlobalDynamicBones");
+
 
             // Initial State
             toggleFly.setToggleState(false);

@@ -6,9 +6,6 @@ namespace IceBurn.Mod.Other
 {
     class FOVChanger : VRmod
     {
-        public override string Name => "FOV Changer";
-        public override string Description => "Changes Field Of View";
-
         public static bool isPC = false;
 
         public override void OnStart()

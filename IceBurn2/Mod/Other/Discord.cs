@@ -5,9 +5,6 @@ namespace IceBurn.Mod.Other
 {
     class Discord : VRmod
     {
-        public override string Name => "Discord Rich Presence";
-        public override string Description => "Custom status for discord";
-
         public override void OnStart()
         {
             DiscordManager.Init();
