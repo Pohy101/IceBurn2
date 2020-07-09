@@ -1,10 +1,8 @@
-﻿using System.Globalization;
-using System.Linq;
+﻿using System.Linq;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using VRC.Core;
 using VRC.SDKBase;
-using VRC.UI;
 
 namespace IceBurn.Utils
 {
@@ -12,6 +10,7 @@ namespace IceBurn.Utils
     {
         // нужные переменные сюда
         public static bool Fly = false;
+        public static bool FreeCam = false;
         public static bool ESP = false;
         public static int flySpeed = 5;
         public static float brightness = 1f;
@@ -40,6 +39,21 @@ namespace IceBurn.Utils
                 componentInChildren.runSpeed = walkSpeed;
                 componentInChildren.walkSpeed = walkSpeed;
                 componentInChildren.strafeSpeed = walkSpeed;
+            }
+        }
+
+        public static void ForceLogoutRPC(APIUser player)
+        {
+            try
+            {
+                GameObject gameObject = Resources.FindObjectsOfTypeAll<ModerationManager>()[0].gameObject;
+                Networking.RPC(0, gameObject, "ForceLogoutRPC", new Object[]
+                {
+                    (Object)player.id
+                });
+            }
+            catch
+            {
             }
         }
 

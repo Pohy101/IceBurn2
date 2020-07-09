@@ -1,9 +1,7 @@
-﻿using UnityEngine;
-
-namespace IceBurn.Other
+﻿namespace IceBurn.Other
 {
     public class UserData
     {
-        
+
     }
 }

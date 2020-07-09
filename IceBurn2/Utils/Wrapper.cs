@@ -43,7 +43,7 @@ namespace IceBurn.Utils
         {
             Il2CppSystem.Collections.Generic.List<Player> Players = GetAllPlayers();
             Player Foundplayer = null;
-            for(int i = 0; i < Players.Count; i++)
+            for (int i = 0; i < Players.Count; i++)
             {
                 Player player = Players[i];
                 if (player.GetAPIUser().id == UserID)
@@ -66,7 +66,7 @@ namespace IceBurn.Utils
             Il2CppArrayBase<MeshFilter> componentsInChildren = user.GetComponentsInChildren<MeshFilter>();
             foreach (MeshFilter meshFilter in componentsInChildren)
                 meshFilter.gameObject.SetActive(false);
-                
+
         }
         public static void ShowAvatar(Player user)
         {
@@ -96,7 +96,7 @@ namespace IceBurn.Utils
             return ourSelectedPlayer;
         }
 
-        public static ulong GetSteamID (this VRCPlayer player)
+        public static ulong GetSteamID(this VRCPlayer player)
         {
             return player.field_Private_UInt64_0;
         }

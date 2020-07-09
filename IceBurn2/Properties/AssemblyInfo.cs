@@ -1,4 +1,4 @@
-﻿using MelonLoader;
+﻿//using MelonLoader;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -34,5 +34,5 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: MelonModInfo(typeof(IceBurn.Main), "IceBurn", "2.0.0", "IceFox", "https://discord.gg/VCbeWNW")]
-[assembly: MelonModGame("VRChat", "VRChat")]
+//[assembly: MelonModInfo(typeof(IceBurn.Main), "IceBurn", "2.0.0", "IceFox", "https://discord.gg/VCbeWNW")]
+//[assembly: MelonModGame("VRChat", "VRChat")]

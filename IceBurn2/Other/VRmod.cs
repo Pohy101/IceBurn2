@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-
-namespace IceBurn.Other
+﻿namespace IceBurn.OtherMod
 {
-    public class VRmod : MonoBehaviour
+    public class VRmod
     {
+        public virtual void OnEarlierStart() { }
         public virtual void OnStart() { }
         public virtual void OnUpdate() { }
         public virtual void OnFixedUpdate() { }
