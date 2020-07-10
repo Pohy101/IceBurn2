@@ -28,10 +28,8 @@ namespace IceBurn.Mod
         public static QMNestedButton teleportMenu;
         public static QMNestedButton pointTeleportMenu;
         public static QMNestedButton speedHackMenu;
-        public static QMNestedButton userUtilsMenu;
         public static QMNestedButton brightnessMenu;
         public static QMNestedButton lightMenu;
-        public static QMNestedButton dropPortalMenu;
 
         // Кнопки Основного меню
         public static QMToggleButton toggleESP;
@@ -69,12 +67,6 @@ namespace IceBurn.Mod
         public static QMHalfButton WalkSpeedDownX;
         public static QMSingleButton ohShiitWalk;
 
-        // Кнопки User
-        public static QMSingleButton forceClone;
-        public static QMSingleButton crashCheck;
-        public static QMSingleButton downloadVRCA;
-        public static QMSingleButton sendMessage;
-
         // Кнопки OwnLight
         public static QMToggleButton toggleOwnLight;
         public static QMToggleButton toggleOwnLightShadows;
@@ -86,13 +78,12 @@ namespace IceBurn.Mod
         // Другие кнопки
         public static QMSingleButton quitApp;
 
-        // XXX
-        private static List<QMHalfButton> tPlayerList = new List<QMHalfButton>();
-        private static List<Player> tmpPlayerList = new List<Player>();
-
         // TeleportPoints
         private static List<GameObject> pointTeleportList = new List<GameObject>();
         private static List<QMHalfButton> tPointList = new List<QMHalfButton>();
+
+        private static List<QMHalfButton> tPlayerList = new List<QMHalfButton>();
+        private static List<Player> tmpPlayerList = new List<Player>();
 
         // Hands
         //static RootMotion.FinalIK.VRIK controller;
@@ -100,6 +91,7 @@ namespace IceBurn.Mod
 
         //PlayerLight
         private static Light PlayerLight = new Light();
+        internal static QMNestedButton userUtilsMenu;
 
         public override void OnStart()
         {
@@ -110,7 +102,6 @@ namespace IceBurn.Mod
             speedHackMenu = new QMNestedButton(mainMenuP1, 1, 2, "Player\nSpeed", "Speed Hack Menu");
             brightnessMenu = new QMNestedButton(mainMenuP2, 1, 1, "Light\nIntensity", "Set Light Intensity");
             lightMenu = new QMNestedButton(mainMenuP2, 3, 1, "Light\nMenu", "User Light Menu");
-            userUtilsMenu = new QMNestedButton("UserInteractMenu", 4, 2, "Utils", "User Utils");
 
             // Это просто нужно
             mainMenuP2.getBackButton().setButtonText("Previous\nPage");
@@ -163,80 +154,6 @@ namespace IceBurn.Mod
                 USpeaker.field_Internal_Static_Single_1 = 1f;
                 IceLogger.Log(ConsoleColor.Green, "EarRape Disabled");
             }), "Toggle EarRape");
-
-            forceClone = new QMSingleButton(userUtilsMenu, 1, 0, "Force\nClone", new Action(() =>
-            {
-                try
-                {
-                    ApiAvatar avatar = Wrapper.GetQuickMenu().GetSelectedPlayer().field_Internal_VRCPlayer_0.prop_ApiAvatar_0;
-
-                    if (avatar.releaseStatus != "private")
-                        new PageAvatar { avatar = new SimpleAvatarPedestal { field_Internal_ApiAvatar_0 = new ApiAvatar { id = avatar.id } } }.ChangeToSelectedAvatar();
-                    else
-                    {
-                        IceLogger.Log("Avatar release status is PRIVATE!");
-                        Popup.Alert("Clone ERROR!", "Avatar release status is PRIVATE!", "Back");
-                        Console.Beep();
-                    }
-                    IceLogger.Log(avatar.id);
-                }
-                catch (Exception)
-                {
-                    IceLogger.Error("User not selected!");
-                    Popup.Alert("Clone ERROR!", "User Not Selected\n[Select User To Clone]", "Back");
-                    throw;
-                }
-            }), "Force Clone User Avatar");
-
-            crashCheck = new QMSingleButton(userUtilsMenu, 2, 0, "Crash\nCheck", new Action(() =>
-            {
-                anticrash.particle_check(Wrapper.GetQuickMenu().GetSelectedPlayer());
-                anticrash.polygon_check(Wrapper.GetQuickMenu().GetSelectedPlayer(), Wrapper.get_poly(Wrapper.GetQuickMenu().GetSelectedPlayer()));
-                anticrash.shader_check(Wrapper.GetQuickMenu().GetSelectedPlayer());
-                anticrash.mesh_check(Wrapper.GetQuickMenu().GetSelectedPlayer());
-                anticrash.mats_check(Wrapper.GetQuickMenu().GetSelectedPlayer());
-                anticrash.work_hk(Wrapper.GetQuickMenu().GetSelectedPlayer(), Wrapper.get_poly(Wrapper.GetQuickMenu().GetSelectedPlayer()));
-                IceLogger.Log("Player Checked");
-            }), "Check User Avatar to crash");
-
-            downloadVRCA = new QMSingleButton(userUtilsMenu, 3, 0, "Download\nVRCA", new Action(() =>
-            {
-                Process.Start(Wrapper.GetQuickMenu().GetSelectedPlayer().field_Internal_VRCPlayer_0.prop_ApiAvatar_0.assetUrl);
-            }), "Download User Avatar in VRCA File");
-
-            sendMessage = new QMSingleButton(userUtilsMenu, 4, 0, "Send\nMessage", new Action(() =>
-            {
-                try
-                {
-                    VRC.Player Splayer = Wrapper.GetQuickMenu().GetSelectedPlayer();
-
-                    Popup.ShowUnityInputPopupWithCancel($"Send Message to: {Splayer.ToString()}", "", "Send", new Action<string, Il2CppSystem.Collections.Generic.List<KeyCode>, Text>((string s, Il2CppSystem.Collections.Generic.List<KeyCode> k, Text t) =>
-                    {
-                        APIUser player = Splayer.field_Private_APIUser_0;
-
-                        Il2CppSystem.String worldId = (Il2CppSystem.String)"";
-                        Il2CppSystem.String worldName = (Il2CppSystem.String)$"\n[IceBurn]: {s}";
-
-                        NotificationDetails notificationDetails = new NotificationDetails();
-                        notificationDetails.Add("worldId", worldId.Cast<Il2CppSystem.Object>());
-                        notificationDetails.Add("worldName", worldName.Cast<Il2CppSystem.Object>());
-                        NotificationManager.prop_NotificationManager_0.Method_Public_Void_String_String_String_NotificationDetails_0(player.id, "invite", string.Empty, notificationDetails);
-                        IceLogger.Log(string.Concat(new string[]
-                        {
-                            "Sent Invite Message to : ",
-                            player.displayName,
-                            " [With Message:",
-                            s,
-                            "]"
-                        }));
-                    }));
-                }
-                catch (Exception ex)
-                {
-                    Popup.Alert("Message Error!", $"Can't Send Message {Wrapper.GetQuickMenu().GetSelectedPlayer().ToString()}", "Close");
-                    IceLogger.Error(ex.ToString());
-                }
-            }), "Send Message TO: Player");
 
             teleportMenu = new QMNestedButton(mainMenuP1, 2, 0, "Teleport", new Action(() =>
             {
@@ -366,158 +283,6 @@ namespace IceBurn.Mod
                     }
                 }
             }), "Teleport To Player");
-
-            dropPortalMenu = new QMNestedButton(mainMenuP2, 4, 1, "Drop\nPortal", new Action(() =>
-            {
-                PlayerWrapper.UpdateFriendList();
-
-                // Remove old Buttons
-                foreach (QMHalfButton item in tPlayerList)
-                    item.DestroyMe();
-                tPlayerList.Clear();
-
-                // Get All Players
-                var players = PlayerWrapper.GetAllPlayers();
-
-                // REAdd Players to List
-                tmpPlayerList.Clear();
-                for (int i = 0; i < players.Count; i++)
-                    tmpPlayerList.Add(players[i]);
-
-                // Button Local Position
-                int localX = 0;
-                float localY = -0.5f;
-
-                if (tmpPlayerList.Count <= 24)
-                {
-                    localX = 1;
-                    foreach (Player player in tmpPlayerList)
-                    {
-                        QMHalfButton tmpButton = new QMHalfButton(dropPortalMenu, localX, localY, player.ToString(), new Action(() =>
-                        {
-                            if (player.field_Private_APIUser_0.id != "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223" || player.field_Internal_VRCPlayer_0.prop_String_1 != PlayerWrapper.GetCurrentPlayer().prop_String_1)
-                                try
-                                {
-                                    IceLogger.Log("Trying Drop TO: [" + player.ToString() + "]");
-                                    GameObject portal = Networking.Instantiate(VRC_EventHandler.VrcBroadcastType.Always, "Portals/PortalInternalDynamic", player.transform.position, player.transform.rotation);
-                                    Networking.RPC(RPC.Destination.AllBufferOne, portal, "ConfigurePortal", new Il2CppSystem.Object[]
-                                    {
-                                        (Il2CppSystem.String)"wrld_3765d091-e420-4e2f-ae63-0dcad48cf5f5",
-                                        //(Il2CppSystem.String)Clipboard.GetText(),
-                                        (Il2CppSystem.String)"99999",
-                                        new Il2CppSystem.Int32
-                                        {
-                                            m_value = 0
-                                        }.BoxIl2CppObject()
-                                    });
-                                }
-                                catch (Exception ex)
-                                {
-                                    IceLogger.Error(ex.ToString());
-                                }
-                        }), "Drop Portal To " + player.ToString());
-
-                        if (PlayerWrapper.isFriend(player.field_Internal_VRCPlayer_0.prop_Player_0))
-                            tmpButton.setTextColor(Color.green);
-                        else
-                            tmpButton.setTextColor(Color.white);
-
-                        if (PlayerWrapper.GetTrustLevel(player) == "Veteran user")
-                            tmpButton.setBackgroundColor(Color.red);
-                        else if (PlayerWrapper.GetTrustLevel(player) == "Trusted user")
-                            tmpButton.setBackgroundColor(Color.magenta);
-                        else if (PlayerWrapper.GetTrustLevel(player) == "Known user")
-                            tmpButton.setBackgroundColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
-                        else if (PlayerWrapper.GetTrustLevel(player) == "User")
-                            tmpButton.setBackgroundColor(Color.green);
-                        else if (PlayerWrapper.GetTrustLevel(player) == "New user")
-                            tmpButton.setBackgroundColor(new Color(0.19f, 0.45f, 0.62f));
-                        else if (PlayerWrapper.GetTrustLevel(player) == "Visitor")
-                            tmpButton.setBackgroundColor(Color.gray);
-
-                        if (player.field_Private_APIUser_0.id == "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223" || player.field_Internal_VRCPlayer_0.prop_String_1 == PlayerWrapper.GetCurrentPlayer().prop_String_1)
-                        {
-                            tmpButton.setBackgroundColor(Color.black);
-                            tmpButton.setTextColor(Color.red);
-                            tmpButton.setAction(null);
-                        }
-
-                        localX++;
-                        if (localX > 4)
-                        {
-                            localX = 1;
-                            localY += 1f;
-                        }
-                        tPlayerList.Add(tmpButton);
-                    }
-                }
-                else
-                {
-                    foreach (Player player in tmpPlayerList)
-                    {
-                        QMHalfButton tmpButton = new QMHalfButton(dropPortalMenu, localX, localY, player.ToString(), new Action(() =>
-                        {
-                            if (player.field_Private_APIUser_0.id != "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223" || player.field_Internal_VRCPlayer_0.prop_String_1 != PlayerWrapper.GetCurrentPlayer().prop_String_1)
-                                try
-                                {
-                                    IceLogger.Log("Trying Drop TO: [" + player.ToString() + "]");
-                                    GameObject portal = Networking.Instantiate(VRC_EventHandler.VrcBroadcastType.Always, "Portals/PortalInternalDynamic", player.transform.position, player.transform.rotation);
-                                    Networking.RPC(RPC.Destination.AllBufferOne, portal, "ConfigurePortal", new Il2CppSystem.Object[]
-                                    {
-                                        (Il2CppSystem.String)"wrld_3765d091-e420-4e2f-ae63-0dcad48cf5f5",
-                                        (Il2CppSystem.String)"99999",
-                                        new Il2CppSystem.Int32
-                                        {
-                                            m_value = 0
-                                        }.BoxIl2CppObject()
-                                    });
-                                }
-                                catch (Exception ex)
-                                {
-                                    IceLogger.Error(ex.ToString());
-                                }
-                        }), "Teleport To " + player.ToString());
-
-                        if (PlayerWrapper.isFriend(player.field_Internal_VRCPlayer_0.prop_Player_0))
-                            tmpButton.setTextColor(Color.green);
-                        else
-                            tmpButton.setTextColor(Color.white);
-
-                        if (PlayerWrapper.GetTrustLevel(player) == "Veteran user")
-                            tmpButton.setBackgroundColor(Color.red);
-                        else if (PlayerWrapper.GetTrustLevel(player) == "Trusted user")
-                            tmpButton.setBackgroundColor(Color.magenta);
-                        else if (PlayerWrapper.GetTrustLevel(player) == "Known user")
-                            tmpButton.setBackgroundColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
-                        else if (PlayerWrapper.GetTrustLevel(player) == "User")
-                            tmpButton.setBackgroundColor(Color.green);
-                        else if (PlayerWrapper.GetTrustLevel(player) == "New user")
-                            tmpButton.setBackgroundColor(new Color(0.19f, 0.45f, 0.62f));
-                        else if (PlayerWrapper.GetTrustLevel(player) == "Visitor")
-                            tmpButton.setBackgroundColor(Color.gray);
-
-                        if (player.field_Private_APIUser_0.id == "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223" || player.field_Internal_VRCPlayer_0.prop_String_1 == PlayerWrapper.GetCurrentPlayer().prop_String_1)
-                        {
-                            tmpButton.setBackgroundColor(Color.black);
-                            tmpButton.setTextColor(Color.red);
-                            tmpButton.setAction(null);
-                        }
-
-                        localX++;
-                        if (localX > 5 && localY < 4f)
-                        {
-                            localX = 0;
-                            localY += 1f;
-                        }
-                        else if (localX > 5 && localY > 2f)
-                        {
-                            localX = 1;
-                            localY += 1f;
-                        }
-                        tPlayerList.Add(tmpButton);
-                    }
-                }
-            }), "Drop Portal TO Player");
 
             void updatepointlist()
             {

@@ -8,25 +8,27 @@ namespace IceBurn.Mod
 {
 	class HandControl : VRmod
 	{
-		//static RootMotion.FinalIK.VRIK controller;
-		//public static Hand hand = Hand.None;
+        public override int LoadOrder => 5;
 
-			/*  
-			 *  Components in Avatar
-				UnityEngine.Transform
-				UnityEngine.Animator
-				VRCSDK2.VRC_AvatarDescriptor
-				VRC.Core.PipelineManager
-				VRC.DynamicBoneController
-				RootMotion.FinalIK.VRIK
-				RootMotion.FinalIK.FullBodyBipedIK
-				LimbIK
-				RealisticEyeMovements.EyeAndHeadAnimator
-				RealisticEyeMovements.LookTargetController
-				NetworkMetadata
-			*/
+        //static RootMotion.FinalIK.VRIK controller;
+        //public static Hand hand = Hand.None;
 
-		public static void SetHandControl()
+        /*  
+         *  Components in Avatar
+            UnityEngine.Transform
+            UnityEngine.Animator
+            VRCSDK2.VRC_AvatarDescriptor
+            VRC.Core.PipelineManager
+            VRC.DynamicBoneController
+            RootMotion.FinalIK.VRIK
+            RootMotion.FinalIK.FullBodyBipedIK
+            LimbIK
+            RealisticEyeMovements.EyeAndHeadAnimator
+            RealisticEyeMovements.LookTargetController
+            NetworkMetadata
+        */
+
+        public static void SetHandControl()
 		{
 			try
 			{

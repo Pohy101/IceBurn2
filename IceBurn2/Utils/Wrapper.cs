@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Logger;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -129,6 +131,18 @@ namespace IceBurn.Utils
             }
             return "unknown";
         }
+
+        public static List<avi> GetPublicAvatars(string userid)
+        {
+            if (userid == "" || userid == null)
+            {
+                return null;
+            }
+            WebRequest webRequest = WebRequest.Create("https://api.vrchat.cloud/api/1/avatars?apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26&userId=" + userid);
+            IceLogger.Log("https://api.vrchat.cloud/api/1/avatars?apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26&userId=" + userid);
+            ServicePointManager.ServerCertificateValidationCallback = ((object s, X509Certificate c, X509Chain cc, SslPolicyErrors ssl) => true);
+            return JsonConvert.DeserializeObject<List<avi>>(GlobalUtils.convert(webRequest.GetResponse()));
+        }
     }
 
     public static class Wrapper
@@ -165,11 +179,6 @@ namespace IceBurn.Utils
         public static QuickMenu GetQuickMenu()
         {
             return QuickMenu.prop_QuickMenu_0;
-        }
-
-        public static VRCUiManager GetRCUiManager()
-        {
-            return VRCUiManager.field_Protected_Static_VRCUiManager_0;
         }
 
         public static void SetToolTipBasedOnToggle(this UiTooltip tooltip)

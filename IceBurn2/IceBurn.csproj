@@ -33,6 +33,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="API\AvatarListAPI.cs" />
     <Compile Include="API\FavoriteButtonAPI.cs" />
     <Compile Include="API\SocialButtonAPI.cs" />
     <Compile Include="Forms\TestForm.cs">
@@ -41,11 +42,14 @@
     <Compile Include="Forms\TestForm.Designer.cs">
       <DependentUpon>TestForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Mods\AvatarFav.cs" />
+    <Compile Include="Mods\DropPortals.cs" />
     <Compile Include="Mods\Fly.cs" />
     <Compile Include="Mods\GDB.cs" />
     <Compile Include="Mods\AntiCrash.cs" />
     <Compile Include="Mods\HandControl.cs" />
     <Compile Include="Mods\UI.cs" />
+    <Compile Include="Mods\UserUtils.cs" />
     <Compile Include="Other\DiscordRPC\Configuration.cs" />
     <Compile Include="Other\DiscordRPC\Converters\EnumSnakeCaseConverter.cs" />
     <Compile Include="Other\DiscordRPC\Converters\EnumValueAttribute.cs" />
@@ -109,11 +113,11 @@
     <Compile Include="Mods\InputHandler.cs" />
     <Compile Include="API\IceButtonAPI.cs" />
     <Compile Include="Other\SaveLoad.cs" />
-    <Compile Include="Other\VRmod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mods\SocialButtons.cs" />
     <Compile Include="Utils\GlobalUtils.cs" />
     <Compile Include="Utils\Popup.cs" />
+    <Compile Include="Utils\UrlObject.cs" />
     <Compile Include="Utils\Wrapper.cs" />
   </ItemGroup>
   <ItemGroup>
