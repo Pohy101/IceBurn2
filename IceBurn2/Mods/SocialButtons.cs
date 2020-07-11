@@ -11,7 +11,7 @@ namespace IceBurn.Mod
 {
     class SocialButtons : VRmod
     {
-        public override int LoadOrder => 3;
+        //public override int LoadOrder => 7;
 
         public static SocialSingleButton DropPortalToPlayer;
 

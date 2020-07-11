@@ -10,7 +10,7 @@ namespace IceBurn.Mods
 {
     public class Fly : VRmod
     {
-        public override int LoadOrder => 7;
+        public override int LoadOrder => 6;
 
         public static QMNestedButton flyMenu;
         public static QMSingleButton resetflySpeed;

@@ -16,7 +16,7 @@ namespace IceBurn.Mod
 {
     public class GlobalDynamicBones : VRmod
     {
-        public override int LoadOrder => 6;
+        //public override int LoadOrder => 6;
 
         private static class NDBConfig
         {

@@ -8,7 +8,7 @@ namespace IceBurn.Mod
 {
     class FOVChanger : VRmod
     {
-        public override int LoadOrder => 4;
+        //public override int LoadOrder => 5;
 
         public static QMHalfButton FOVUp;
         public static QMHalfButton FOVUpX;

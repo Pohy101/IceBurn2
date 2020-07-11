@@ -12,7 +12,7 @@ namespace IceBurn.Mod
 {
     public class DropPortals : VRmod
     {
-        public override int LoadOrder => 10;
+        public override int LoadOrder => 2;
 
         public static QMNestedButton dropPortalMenu;
         private static List<QMHalfButton> tPlayerList = new List<QMHalfButton>();

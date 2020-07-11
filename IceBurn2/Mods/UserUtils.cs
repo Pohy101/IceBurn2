@@ -1,5 +1,4 @@
 ﻿using IceBurn.API;
-using IceBurn.Mod;
 using IceBurn.Utils;
 using IceBurn.Utils.Popup;
 using IceModSystem;
@@ -7,9 +6,6 @@ using Logger;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Transmtn.DTO.Notifications;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,7 +17,7 @@ namespace IceBurn.Mod
 {
     public class UserUtils : VRmod
     {
-        public override int LoadOrder => 9;
+        //public override int LoadOrder => 2;
 
         public static QMNestedButton userUtilsMenu;
 

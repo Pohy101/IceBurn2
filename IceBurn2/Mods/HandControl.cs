@@ -8,7 +8,7 @@ namespace IceBurn.Mod
 {
 	class HandControl : VRmod
 	{
-        public override int LoadOrder => 5;
+        //public override int LoadOrder => 5;
 
         //static RootMotion.FinalIK.VRIK controller;
         //public static Hand hand = Hand.None;

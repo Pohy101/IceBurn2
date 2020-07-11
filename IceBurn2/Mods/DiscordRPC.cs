@@ -7,7 +7,7 @@ namespace IceBurn.Mod
 {
     public class Discord : VRmod
     {
-        public override int LoadOrder => 11;
+        //public override int LoadOrder => 11;
 
         DiscordRpcClient client;
         RichPresence presence;

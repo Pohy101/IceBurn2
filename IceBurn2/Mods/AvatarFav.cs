@@ -13,7 +13,7 @@ namespace IceBurn.Mod
 {
     public class AvatarFav : VRmod
     {
-        public override int LoadOrder => 8;
+        //public override int LoadOrder => 8;
 
         public static FavSingleButton FavoriteBtn;
 

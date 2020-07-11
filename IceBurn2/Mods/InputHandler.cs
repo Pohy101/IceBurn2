@@ -14,7 +14,7 @@ namespace IceBurn.Mod
 {
     class InputHandler : VRmod
     {
-        public override int LoadOrder => 2;
+        //public override int LoadOrder => 4;
 
         public override void OnUpdate()
         {
