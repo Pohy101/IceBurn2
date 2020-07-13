@@ -27,6 +27,7 @@ namespace IceBurn.Mod
         // Token: 0x060000CF RID: 207 RVA: 0x00008C20 File Offset: 0x00006E20
         public static bool particle_check(Player user)
         {
+            MelonModLogger.Log(ConsoleColor.Blue, "dupa123!!@! ");
             Il2CppArrayBase<ParticleSystem> componentsInChildren = user.GetComponentsInChildren<ParticleSystem>(true);
             if (componentsInChildren == null || componentsInChildren.Count == 0)
             {

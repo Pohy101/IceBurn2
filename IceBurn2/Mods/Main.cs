@@ -13,7 +13,7 @@ namespace IceBurn
 
         public override void OnEarlierStart()
         {
-            Console.Title = "Ice Burn 2 - BY IceFox";
+            Console.Title = "Ice Burn 2 - BY IceFox and lepper";
             Application.targetFrameRate = 144;
             ModPrefs.RegisterPrefBool("vrcdiscordpresence", "hidenameondiscord", true, "Hide your name on Discord", false);
 
