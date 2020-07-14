@@ -43,11 +43,14 @@
       <DependentUpon>TestForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mods\AvatarFav.cs" />
-    <None Include="Mods\DropPortals.cs" />
+    <Compile Include="Mods\DropPortals.cs" />
+    <Compile Include="Mods\EarRape.cs" />
+    <Compile Include="Mods\FakeNameplate.cs" />
     <Compile Include="Mods\Fly.cs" />
     <Compile Include="Mods\GDB.cs" />
     <Compile Include="Mods\AntiCrash.cs" />
     <Compile Include="Mods\HandControl.cs" />
+    <Compile Include="Mods\TeleportToPlayer.cs" />
     <Compile Include="Mods\UI.cs" />
     <Compile Include="Mods\UserUtils.cs" />
     <Compile Include="Other\DiscordRPC\Configuration.cs" />
@@ -128,6 +131,7 @@
     <Reference Include="IceLoader, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\Mods\IceLoader.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Il2Cppmscorlib">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Il2Cppmscorlib.dll</HintPath>

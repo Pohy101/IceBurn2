@@ -14,7 +14,7 @@ namespace IceBurn.Mod
 {
     class InputHandler : VRmod
     {
-        //public override int LoadOrder => 4;
+        public override int LoadOrder => 8;
 
         public override void OnUpdate()
         {
@@ -57,23 +57,6 @@ namespace IceBurn.Mod
                         sRegion.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Color.red);
                         HighlightsFX.prop_HighlightsFX_0.EnableOutline(sRegion.GetComponent<Renderer>(), GlobalUtils.ESP);
                     }
-                }
-            }
-
-            // Ебать уши другим игрокам на F9
-            if (Input.GetKeyDown(KeyCode.F9))
-            {
-                if (USpeaker.field_Internal_Static_Single_1 <= 1f)
-                {
-                    UI.toggleEarRape.setToggleState(true);
-                    USpeaker.field_Internal_Static_Single_1 = float.MaxValue;
-                    IceLogger.Log("EarRape Enabled");
-                }
-                else
-                {
-                    UI.toggleEarRape.setToggleState(false);
-                    USpeaker.field_Internal_Static_Single_1 = 1f;
-                    IceLogger.Log("EarRape Disabled");
                 }
             }
 

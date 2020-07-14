@@ -25,7 +25,6 @@ namespace IceBurn.Mod
         public static QMNestedButton mainMenuP1;
         public static QMNestedButton mainMenuP2;
         public static QMNestedButton mainMenuP3;
-        public static QMNestedButton teleportMenu;
         public static QMNestedButton pointTeleportMenu;
         public static QMNestedButton speedHackMenu;
         public static QMNestedButton brightnessMenu;
@@ -33,7 +32,6 @@ namespace IceBurn.Mod
 
         // Кнопки Основного меню
         public static QMToggleButton toggleESP;
-        public static QMToggleButton toggleEarRape;
         public static QMSingleButton hideAllPortals;
         public static QMToggleButton toggleFakeNamePlate;
         public static QMToggleButton toggleAudioBitrate;
@@ -91,7 +89,6 @@ namespace IceBurn.Mod
 
         //PlayerLight
         private static Light PlayerLight = new Light();
-        internal static QMNestedButton userUtilsMenu;
 
         public override void OnStart()
         {
@@ -143,146 +140,6 @@ namespace IceBurn.Mod
                 }
                 IceLogger.Log("ESP has been Disabled");
             }), "Toggle ESP");
-
-            toggleEarRape = new QMToggleButton(mainMenuP1, 4, 0,
-            "EarRape ON", new Action(() =>
-            {
-                USpeaker.field_Internal_Static_Single_1 = float.MaxValue;
-                IceLogger.Log(ConsoleColor.Red, "EarRape Enabled");
-            }), "EarRape OFF", new Action(() =>
-            {
-                USpeaker.field_Internal_Static_Single_1 = 1f;
-                IceLogger.Log(ConsoleColor.Green, "EarRape Disabled");
-            }), "Toggle EarRape");
-
-            teleportMenu = new QMNestedButton(mainMenuP1, 2, 0, "Teleport", new Action(() =>
-            {
-                PlayerWrapper.UpdateFriendList();
-
-                // Remove old Buttons
-                foreach (QMHalfButton item in tPlayerList)
-                    item.DestroyMe();
-                tPlayerList.Clear();
-
-                // Get All Players
-                var players = PlayerWrapper.GetAllPlayers();
-
-                // REAdd Players to List
-                tmpPlayerList.Clear();
-                for (int i = 0; i < players.Count; i++)
-                    tmpPlayerList.Add(players[i]);
-
-                // Button Local Position
-                int localX = 0;
-                float localY = -0.5f;
-
-                if (tmpPlayerList.Count <= 24)
-                {
-                    localX = 1;
-                    foreach (Player player in tmpPlayerList)
-                    {
-                        QMHalfButton tmpButton = new QMHalfButton(teleportMenu, localX, localY, player.ToString(), new Action(() =>
-                        {
-                            try
-                            {
-                                IceLogger.Log("Trying Teleport TO: [" + player.ToString() + "]");
-                                PlayerWrapper.GetCurrentPlayer().transform.position = player.transform.position;
-                            }
-                            catch (Exception ex)
-                            {
-                                IceLogger.Error(ex.ToString());
-                            }
-                        }), "Teleport To " + player.ToString());
-
-                        if (PlayerWrapper.isFriend(player.field_Internal_VRCPlayer_0.prop_Player_0))
-                            tmpButton.setTextColor(Color.green);
-                        else
-                            tmpButton.setTextColor(Color.white);
-
-                        if (PlayerWrapper.GetTrustLevel(player) == "Veteran user")
-                            tmpButton.setBackgroundColor(Color.red);
-                        else if (PlayerWrapper.GetTrustLevel(player) == "Trusted user")
-                            tmpButton.setBackgroundColor(Color.magenta);
-                        else if (PlayerWrapper.GetTrustLevel(player) == "Known user")
-                            tmpButton.setBackgroundColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
-                        else if (PlayerWrapper.GetTrustLevel(player) == "User")
-                            tmpButton.setBackgroundColor(Color.green);
-                        else if (PlayerWrapper.GetTrustLevel(player) == "New user")
-                            tmpButton.setBackgroundColor(new Color(0.19f, 0.45f, 0.62f));
-                        else if (PlayerWrapper.GetTrustLevel(player) == "Visitor")
-                            tmpButton.setBackgroundColor(Color.gray);
-
-                        if (player.field_Private_APIUser_0.id == "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223" || player.field_Internal_VRCPlayer_0.prop_String_1 == PlayerWrapper.GetCurrentPlayer().prop_String_1)
-                        {
-                            tmpButton.setBackgroundColor(Color.black);
-                            tmpButton.setTextColor(Color.red);
-                        }
-
-                        localX++;
-                        if (localX > 4)
-                        {
-                            localX = 1;
-                            localY += 1f;
-                        }
-                        tPlayerList.Add(tmpButton);
-                    }
-                }
-                else
-                {
-                    foreach (Player player in tmpPlayerList)
-                    {
-                        QMHalfButton tmpButton = new QMHalfButton(teleportMenu, localX, localY, player.ToString(), new Action(() =>
-                        {
-                            try
-                            {
-                                IceLogger.Log("Trying Teleport TO: [" + player.ToString() + "]");
-                                PlayerWrapper.GetCurrentPlayer().transform.position = player.transform.position;
-                            }
-                            catch (Exception ex)
-                            {
-                                IceLogger.Error(ex.ToString());
-                            }
-                        }), "Teleport To " + player.ToString());
-
-                        if (PlayerWrapper.isFriend(player.field_Internal_VRCPlayer_0.prop_Player_0))
-                            tmpButton.setTextColor(Color.green);
-                        else
-                            tmpButton.setTextColor(Color.white);
-
-                        if (PlayerWrapper.GetTrustLevel(player) == "Veteran user")
-                            tmpButton.setBackgroundColor(Color.red);
-                        else if (PlayerWrapper.GetTrustLevel(player) == "Trusted user")
-                            tmpButton.setBackgroundColor(Color.magenta);
-                        else if (PlayerWrapper.GetTrustLevel(player) == "Known user")
-                            tmpButton.setBackgroundColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
-                        else if (PlayerWrapper.GetTrustLevel(player) == "User")
-                            tmpButton.setBackgroundColor(Color.green);
-                        else if (PlayerWrapper.GetTrustLevel(player) == "New user")
-                            tmpButton.setBackgroundColor(new Color(0.19f, 0.45f, 0.62f));
-                        else if (PlayerWrapper.GetTrustLevel(player) == "Visitor")
-                            tmpButton.setBackgroundColor(Color.gray);
-
-                        if (player.field_Private_APIUser_0.id == "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223" || player.field_Internal_VRCPlayer_0.prop_String_1 == PlayerWrapper.GetCurrentPlayer().prop_String_1)
-                        {
-                            tmpButton.setBackgroundColor(Color.black);
-                            tmpButton.setTextColor(Color.red);
-                        }
-
-                        localX++;
-                        if (localX > 5 && localY < 4f)
-                        {
-                            localX = 0;
-                            localY += 1f;
-                        }
-                        else if (localX > 5 && localY > 2f)
-                        {
-                            localX = 1;
-                            localY += 1f;
-                        }
-                        tPlayerList.Add(tmpButton);
-                    }
-                }
-            }), "Teleport To Player");
 
             void updatepointlist()
             {
@@ -431,61 +288,6 @@ namespace IceBurn.Mod
                      p.transform.root.gameObject.SetActive(false);
                  });
             }), "Hide All Portals");
-
-            toggleFakeNamePlate = new QMToggleButton(mainMenuP1, 4, 1, "Fake Nameplate", new Action(() =>
-            {
-                var allPlayers = PlayerWrapper.GetAllPlayers();
-                for (int i = 0; i < allPlayers.Count; i++)
-                {
-                    allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.red);
-                    allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.red;
-                    allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.red;
-                    allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.red;
-                    allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.clear;
-                    allPlayers[i].field_Internal_VRCPlayer_0.namePlateTalkSprite = allPlayers[i].field_Internal_VRCPlayer_0.namePlateSilentSprite;
-                }
-            }), "Real Nameplate", new Action(() =>
-            {
-                PlayerWrapper.UpdateFriendList();
-
-                var allPlayers = PlayerWrapper.GetAllPlayers().ToArray();
-                for (int i = 0; i < allPlayers.Length; i++)
-                {
-                    Transform sRegion = allPlayers[i].transform.Find("SelectRegion");
-                    allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.green;
-                    allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.white;
-                    allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.white;
-                    allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.black;
-                    allPlayers[i].field_Internal_VRCPlayer_0.namePlateTalkSprite = allPlayers[i].field_Internal_VRCPlayer_0.namePlateSilentSprite;
-
-                    if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Veteran user")
-                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.red);
-                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Trusted user")
-                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.magenta);
-                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Known user")
-                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.Lerp(Color.yellow, Color.red, 0.5f));
-                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "User")
-                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.green);
-                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "New user")
-                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(new Color(0.3f, 0.72f, 1f));
-                    else if (PlayerWrapper.GetTrustLevel(allPlayers[i]) == "Visitor")
-                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.gray);
-
-                    if (sRegion != null)
-                        sRegion.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", Color.red);
-
-                    HighlightsFX.prop_HighlightsFX_0.field_Protected_Material_0.SetColor("_HighlightColor", Color.red);
-
-                    if (allPlayers[i].field_Internal_VRCPlayer_0.prop_String_1 == "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223")
-                    {
-                        allPlayers[i].field_Private_VRCPlayerApi_0.SetNamePlateColor(Color.black);
-                        allPlayers[i].field_Internal_VRCPlayer_0.namePlate.mainText.color = Color.red;
-                        allPlayers[i].field_Internal_VRCPlayer_0.namePlate.dropShadow.color = Color.clear;
-                        allPlayers[i].field_Internal_VRCPlayer_0.friendSprite.color = Color.red;
-                        allPlayers[i].field_Internal_VRCPlayer_0.speakingSprite.color = Color.red;
-                    }
-                }
-            }), "Toggle Fake NameSpace");
 
             toggleAudioBitrate = new QMToggleButton(mainMenuP1, 2, 2, "64kbps", new Action(() =>
             {

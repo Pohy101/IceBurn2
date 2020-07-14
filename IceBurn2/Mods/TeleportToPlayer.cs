@@ -1,26 +1,25 @@
-﻿using IceBurn.API;
+﻿using System;
+using System.Collections.Generic;
+using IceBurn.API;
 using IceBurn.Utils;
 using IceModSystem;
 using Logger;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using VRC;
-using VRC.SDKBase;
 
 namespace IceBurn.Mod
 {
-    public class DropPortals : VRmod
+    public class TeleportToPlayer : VRmod
     {
-        public override int LoadOrder => 3;
+        public override int LoadOrder => 12;
 
-        public static QMNestedButton dropPortalMenu;
+        public static QMNestedButton teleportMenu;
         private static List<QMHalfButton> tPlayerList = new List<QMHalfButton>();
         private static List<Player> tmpPlayerList = new List<Player>();
 
         public override void OnStart()
         {
-            dropPortalMenu = new QMNestedButton(UI.mainMenuP2, 4, 1, "Drop\nPortal", new Action(() =>
+            teleportMenu = new QMNestedButton(UI.mainMenuP1, 2, 0, "Teleport", new Action(() =>
             {
                 PlayerWrapper.UpdateFriendList();
 
@@ -46,29 +45,18 @@ namespace IceBurn.Mod
                     localX = 1;
                     foreach (Player player in tmpPlayerList)
                     {
-                        QMHalfButton tmpButton = new QMHalfButton(dropPortalMenu, localX, localY, player.ToString(), new Action(() =>
+                        QMHalfButton tmpButton = new QMHalfButton(teleportMenu, localX, localY, player.ToString(), new Action(() =>
                         {
-                            if (player.field_Private_APIUser_0.id != "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223" || player.field_Internal_VRCPlayer_0.prop_String_1 != PlayerWrapper.GetCurrentPlayer().prop_String_1)
-                                try
-                                {
-                                    IceLogger.Log("Trying Drop TO: [" + player.ToString() + "]");
-                                    GameObject portal = Networking.Instantiate(VRC_EventHandler.VrcBroadcastType.Always, "Portals/PortalInternalDynamic", player.transform.position, player.transform.rotation);
-                                    Networking.RPC(RPC.Destination.AllBufferOne, portal, "ConfigurePortal", new Il2CppSystem.Object[]
-                                    {
-                                        (Il2CppSystem.String)"wrld_3765d091-e420-4e2f-ae63-0dcad48cf5f5",
-                                        //(Il2CppSystem.String)Clipboard.GetText(),
-                                        (Il2CppSystem.String)$" {player.GetAPIUser().displayName} \0",
-                                        new Il2CppSystem.Int32
-                                        {
-                                            m_value = 0
-                                        }.BoxIl2CppObject()
-                                    });
-                                }
-                                catch (Exception ex)
-                                {
-                                    IceLogger.Error(ex.ToString());
-                                }
-                        }), "Drop Portal TO: " + player.ToString());
+                            try
+                            {
+                                IceLogger.Log("Trying Teleport TO: [" + player.ToString() + "]");
+                                PlayerWrapper.GetCurrentPlayer().transform.position = player.transform.position;
+                            }
+                            catch (Exception ex)
+                            {
+                                IceLogger.Error(ex.ToString());
+                            }
+                        }), "Teleport To " + player.ToString());
 
                         if (PlayerWrapper.isFriend(player.field_Internal_VRCPlayer_0.prop_Player_0))
                             tmpButton.setTextColor(Color.green);
@@ -92,7 +80,6 @@ namespace IceBurn.Mod
                         {
                             tmpButton.setBackgroundColor(Color.black);
                             tmpButton.setTextColor(Color.red);
-                            tmpButton.setAction(null);
                         }
 
                         localX++;
@@ -108,28 +95,18 @@ namespace IceBurn.Mod
                 {
                     foreach (Player player in tmpPlayerList)
                     {
-                        QMHalfButton tmpButton = new QMHalfButton(dropPortalMenu, localX, localY, player.ToString(), new Action(() =>
+                        QMHalfButton tmpButton = new QMHalfButton(teleportMenu, localX, localY, player.ToString(), new Action(() =>
                         {
-                            if (player.field_Private_APIUser_0.id != "usr_77979962-76e0-4b27-8ab7-ffa0cda9e223" || player.field_Internal_VRCPlayer_0.prop_String_1 != PlayerWrapper.GetCurrentPlayer().prop_String_1)
-                                try
-                                {
-                                    IceLogger.Log("Trying Drop TO: [" + player.ToString() + "]");
-                                    GameObject portal = Networking.Instantiate(VRC_EventHandler.VrcBroadcastType.Always, "Portals/PortalInternalDynamic", player.transform.position, player.transform.rotation);
-                                    Networking.RPC(RPC.Destination.AllBufferOne, portal, "ConfigurePortal", new Il2CppSystem.Object[]
-                                    {
-                                        (Il2CppSystem.String)"wrld_3765d091-e420-4e2f-ae63-0dcad48cf5f5",
-                                        (Il2CppSystem.String)$" {player.GetAPIUser().displayName} \0",
-                                        new Il2CppSystem.Int32
-                                        {
-                                            m_value = 0
-                                        }.BoxIl2CppObject()
-                                    });
-                                }
-                                catch (Exception ex)
-                                {
-                                    IceLogger.Error(ex.ToString());
-                                }
-                        }), "Drop Portal TO: " + player.ToString());
+                            try
+                            {
+                                IceLogger.Log("Trying Teleport TO: [" + player.ToString() + "]");
+                                PlayerWrapper.GetCurrentPlayer().transform.position = player.transform.position;
+                            }
+                            catch (Exception ex)
+                            {
+                                IceLogger.Error(ex.ToString());
+                            }
+                        }), "Teleport To " + player.ToString());
 
                         if (PlayerWrapper.isFriend(player.field_Internal_VRCPlayer_0.prop_Player_0))
                             tmpButton.setTextColor(Color.green);
@@ -153,7 +130,6 @@ namespace IceBurn.Mod
                         {
                             tmpButton.setBackgroundColor(Color.black);
                             tmpButton.setTextColor(Color.red);
-                            tmpButton.setAction(null);
                         }
 
                         localX++;
@@ -170,7 +146,7 @@ namespace IceBurn.Mod
                         tPlayerList.Add(tmpButton);
                     }
                 }
-            }), "Drop Portal TO Player");
+            }), "Teleport To Player");
         }
     }
 }

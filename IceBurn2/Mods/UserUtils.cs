@@ -17,7 +17,7 @@ namespace IceBurn.Mod
 {
     public class UserUtils : VRmod
     {
-        //public override int LoadOrder => 2;
+        public override int LoadOrder => 11;
 
         public static QMNestedButton userUtilsMenu;
 
