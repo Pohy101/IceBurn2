@@ -33,7 +33,6 @@ namespace IceBurn.Mod
         // Кнопки Основного меню
         public static QMToggleButton toggleESP;
         public static QMSingleButton hideAllPortals;
-        public static QMToggleButton toggleFakeNamePlate;
         public static QMToggleButton toggleAudioBitrate;
         public static QMSingleButton reconnectInstance;
         public static QMSingleButton test;
